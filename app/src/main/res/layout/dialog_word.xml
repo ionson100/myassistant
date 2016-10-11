@@ -12,7 +12,6 @@
             android:gravity="center_vertical"
             android:id="@+id/word_e"
             android:padding="10dp"
-            android:text="sdhjshd"
             android:textSize="20dp"
             android:textColor="@android:color/black"
             android:layout_width="match_parent"
@@ -22,14 +21,17 @@
         android:gravity="center_vertical"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.1">
+        android:layout_weight="0.1"
+        android:weightSum="1">
         <ImageButton
 
+            android:paddingRight="10dp"
             android:id="@+id/add_select"
-            android:src="@drawable/ic_star"
+            android:src="@drawable/ic_add"
             android:background="@null"
-            android:layout_width="50dp"
-            android:layout_height="50dp" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+             />
 
     </LinearLayout>
 

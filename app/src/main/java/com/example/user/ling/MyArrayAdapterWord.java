@@ -42,6 +42,7 @@ public class MyArrayAdapterWord extends ArrayAdapter<String> {
         }
         text_word.setText(p);
 
+        mView.setTag(p);
 
         return mView;
     }

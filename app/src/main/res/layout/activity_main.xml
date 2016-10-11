@@ -37,6 +37,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
                     <TextView
+                        android:longClickable="true"
+                        android:textIsSelectable="true"
                         android:id="@+id/text_core"
                         android:textSize="20dp"
                         android:textColor="@android:color/black"
@@ -53,6 +55,22 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="0dp">
+
+            <LinearLayout
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="horizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <ImageButton
+                    android:id="@+id/image_delete_select_word"
+                    android:background="@null"
+                    android:src="@drawable/ic_delete"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp" />
+
+            </LinearLayout>
             <LinearLayout
                 android:gravity="center_vertical|center_horizontal"
                 android:orientation="horizontal"
@@ -99,6 +117,7 @@
                     android:layout_height="50dp" />
             </LinearLayout>
             <LinearLayout
+
                 android:gravity="center_vertical|center_horizontal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -132,18 +151,40 @@
             android:layout_height="54dp">
 
         <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_weight="0.9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:text=""
+                    android:selectAllOnFocus="true"
+                    android:layout_gravity="bottom"
 
-            <EditText
-                android:text=""
-                android:selectAllOnFocus="true"
-                android:layout_gravity="bottom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/find_word"
+                    android:inputType="text" />
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:id="@+id/searsh_text"
+                android:layout_weight="0.1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ImageButton
 
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/find_word"
-                android:inputType="text" />
+                    android:id="@+id/button_text_search"
+                    android:background="@null"
+                    android:src="@drawable/ic_search"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp" />
+
+            </LinearLayout>
+
+
         </LinearLayout>
 
     </RelativeLayout>

@@ -1,12 +1,18 @@
 package com.example.user.ling.tranlate;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
+
+import com.example.user.ling.Utils;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import javax.net.ssl.HttpsURLConnection;
 import static com.example.user.ling.tranlate.YandexTranslatorAPI.ENCODING;
+import static com.example.user.ling.tranlate.YandexTranslatorAPI.activity;
 
 public abstract class YandexTranslatorAPI {
     //Encoding type
@@ -17,6 +23,7 @@ public abstract class YandexTranslatorAPI {
     protected static final String PARAM_API_KEY = "key=",
             PARAM_LANG_PAIR = "&lang=",
             PARAM_TEXT = "&text=";
+    public static Activity activity;
 
     public static void setKey(final String pKey) {
         apiKey = pKey;
@@ -28,8 +35,9 @@ public abstract class YandexTranslatorAPI {
         return sd.get();
     }
 
-    protected static String retrievePropArrString(final URL url, final String jsonValProperty) throws Exception {
-         String response = retrieveResponse(url);
+    protected static String retrievePropArrString(final URL url, final String jsonValProperty, Activity activity) throws Exception {
+        YandexTranslatorAPI.activity = activity;
+        String response = retrieveResponse(url);
         return response;
 
     }
@@ -44,11 +52,19 @@ public abstract class YandexTranslatorAPI {
 
 }
 class RetrieveFeedTask extends AsyncTask<URL, Void, String> {
+    ProgressDialog dialog;
 
+    @Override
+    protected void onPreExecute() {
+        dialog = Utils.factoryDialog(activity, "Запрос на Яндекс", null);
+        dialog.show();
+    }
 
     @Override
     protected void onPostExecute(String s) {
-        super.onPostExecute(s);
+        if (dialog != null) {
+            dialog.cancel();
+        }
     }
 
     @Override
@@ -68,7 +84,7 @@ class RetrieveFeedTask extends AsyncTask<URL, Void, String> {
             }
             return result;
         }catch (Exception ex){
-            return null;
+            return "Возможно проблемы со связью:"+ex.getMessage();
         }
         finally {
             if(uc!=null) {
