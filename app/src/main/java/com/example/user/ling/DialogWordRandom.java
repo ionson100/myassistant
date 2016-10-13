@@ -10,12 +10,15 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.user.ling.orm2.Configure;
+import com.example.user.ling.orm2.Table;
+
 public class DialogWordRandom extends DialogFragment {
 
-    String word="";
+    MDictionary mDictionary;
 
-    public void setWord(String word){
-        this.word=word;
+    public void setDictionary(MDictionary dictionary){
+        this.mDictionary=dictionary;
     }
 
     @NonNull
@@ -23,23 +26,18 @@ public class DialogWordRandom extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LayoutInflater vi;
-        vi = LayoutInflater.from(getActivity());
-        View v = vi.inflate(R.layout.dialog_word, null);
-        TextView textView= (TextView) v.findViewById(R.id.word_e);
+        View v = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_word, null);
+
+        ((TextView) v.findViewById(R.id.word_e)).setText(mDictionary.valueWord);
+
         v.findViewById(R.id.add_select).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-            }
-        });
-        textView.setText(word);
-        v.findViewById(R.id.add_select).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(word.trim().length()>0){
-                    Utils.addSelectWord(word,getContext());
-
+                if(mDictionary.valueWord.trim().length()>0){
+                    mDictionary.isSelect=true;
+                    mDictionary.index=++Utils.indexSurogat;
+                    Configure.getSession().update(mDictionary);
+                    Toast.makeText(getContext(), R.string.add, Toast.LENGTH_SHORT).show();
                 }
             }
         });

@@ -5,76 +5,63 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.AssetManager;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+import android.view.inputmethod.InputMethodManager;
+import android.view.inputmethod.InputMethodSubtype;
 import android.widget.Toast;
 
 import com.example.user.ling.orm2.Configure;
 import com.example.user.ling.orm2.ISession;
+import com.example.user.ling.tranlate.Language;
+import com.example.user.ling.tranlate.Translate;
+import com.google.gson.Gson;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
-import static android.R.attr.action;
-import static android.R.attr.breadCrumbShortTitle;
+import static android.view.View.Z;
 
-/**
- * Created by USER on 07.10.2016.
- */
 
 public class Utils {
-    private static List<SelectWords> list=null;
-    public synchronized static List<SelectWords> getSelectWordses(){
-        if(list==null){
-            list=Configure.getSession().getList(SelectWords.class,null);
-        }
-        return list;
-    }
 
-    public static boolean addSelectWord(String s,Context context){
-        boolean result=false;
-        int hash=  s.hashCode();
-        ISession ses = Configure.getSession();
-        List<SelectWords> listq=ses.getList(SelectWords.class," hash = "+String.valueOf(hash));
-        if(listq.size()==0){
-            SelectWords words=new SelectWords();
-            words.hash=hash;
-            words.text=s;
-            ses.insert(words);
-            result=true;
-            Toast.makeText(context, "Add", Toast.LENGTH_SHORT).show();
+    public static int indexSurogat;
+    public static final String[] listABC = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","Y","Z" };
 
-        }
-        list=null;
-        return result;
-    }
+    synchronized static List<MDictionary> getSelectWordses(){
 
-    public static boolean containsWord( String s){
-        boolean res=false;
-
-        for (SelectWords words : getSelectWordses()) {
-            if(words.text.equals(s)){
-                res=true;
-                break;
+        List<MDictionary> res=new ArrayList<>();
+        for (MDictionary mDictionary : MainActivity.mDictionaryList) {
+            if(mDictionary.isSelect){
+                res.add(mDictionary);
             }
         }
-        return  res;
+        Collections.sort(res, new Comparator<MDictionary>() {
+            @Override
+            public int compare(MDictionary mDictionary, MDictionary t1) {
+                return Integer.compare(mDictionary.index,t1.index);
+            }
+        });
+       // List<MDictionary> as=Configure.getSession().getList(MDictionary.class," is_select = 1 ");
+            return res;
     }
 
-    public static void removeSelect(SelectWords selectWords,Context context) {
-        Configure.getSession().delete(selectWords);
-        list=null;
-        if(context!=null)
-        Toast.makeText(context, R.string.removed, Toast.LENGTH_SHORT).show();
-    }
-    public static String readFile(String filename)
+
+
+
+
+
+
+     static String readFile(String filename)
     {
         String content = "";
-        File file = new File(filename); //for ex foo.txt
+        File file = new File(filename);
         FileReader reader = null;
         try {
             reader = new FileReader(file);
@@ -95,33 +82,9 @@ public class Utils {
         }
         return content;
     }
-   public static String getStringAccert(String fileName, Context context){
-        AssetManager am = context.getAssets();
-        InputStream is = null;
-        try {
-            is = am.open(fileName);
-        } catch (IOException e) {
-            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
 
-        BufferedReader r = null;
-        if (is != null) {
-            r = new BufferedReader(new InputStreamReader(is));
-        }
-        StringBuilder total = new StringBuilder();
-        String line;
-        try {
-            if (r != null) {
-                while ((line = r.readLine()) != null) {
-                    total.append(line).append('\n');
-                }
-            }
-        } catch (IOException e) {
-            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-      return   total.toString();
-    }
-    public static void messageBox(final String title, final String message, final Activity activity, final IAction iAction) {
+
+     static void messageBox(final String title, final String message, final Activity activity, final IAction iAction) {
         if (activity == null) return;
         activity.runOnUiThread(new Runnable() {
             public void run() {
@@ -130,7 +93,13 @@ public class Utils {
                         .setTitle(title)
                         .setMessage(message)
                         .setIcon(android.R.drawable.ic_dialog_info)
-                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        })
+                        .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 if (iAction != null) {
                                     iAction.action(null);
@@ -145,25 +114,9 @@ public class Utils {
         });
     }
 
-    public static boolean removeSelectE(String string, Context context) {
-        boolean res=false;
-        SelectWords d=null;
-        for (SelectWords words : list) {
-            if(words.text.equals(string)){
-                d=words;
-                break;
-            }
-        }
-        if(d!=null){
-            Configure.getSession().delete(d);
-            list=null;
-            Toast.makeText(context, R.string.removed, Toast.LENGTH_SHORT).show();
-            res=true;
-        }
 
-       return res;
 
-    }
+
 
     public static ProgressDialog factoryDialog(Activity mActivity, String msg, final IAction iAction) {
         ProgressDialog dialog = new ProgressDialog(mActivity);
@@ -180,9 +133,32 @@ public class Utils {
                 }
             });
         }
-
-
         return dialog;
+    }
+
+    static void SenderYandex(String selectedText, List<MDictionary> dictionaryArrayList, Activity activity) {
+        String translatedText="";
+        try {
+            Translate.setKey("trnsl.1.1.20161006T095643Z.9887c471401acf62.edb45ac820c51c1dc67ee16076cb0390c4806133");
+            translatedText = Translate.execute(selectedText, Language.ENGLISH, Language.RUSSIAN,activity);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try{
+            Gson sd3 = new Gson();
+            TempSender res = sd3.fromJson(translatedText, TempSender.class);
+            StringBuilder stringBuilder = new StringBuilder(selectedText+" - ");
+            for (String string : res.text) {
+                stringBuilder.append(string).append("\n");
+            }
+            MDictionary mDictionary=new MDictionary();
+            mDictionary.valueWord=stringBuilder.toString();
+            dictionaryArrayList.add(mDictionary);
+        }catch (Exception ex){
+            MDictionary mDictionary=new MDictionary();
+            mDictionary.valueWord=translatedText;
+            dictionaryArrayList.add(mDictionary);
+        }
     }
 }
 

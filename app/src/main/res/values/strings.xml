@@ -1,11 +1,28 @@
 <resources>
     <string name="app_name">My fight</string>
-    <string name="add">Добавить в избранное.</string>
+    <string name="add">Добавить в избранное</string>
     <string name="remove">Удалить из избранных</string>
     <string name="warning">Предупреждение</string>
     <string name="error1">Будут удалены все выбранные слова. OK?</string>
     <string name="all_removed">All Removed</string>
     <string name="removed">Removed</string>
-    <string name="hint">Текст преревода</string>
+    <string name="hint">Текст перевода</string>
     <string name="ups">ups</string>
+    <string name="save">Сохранить</string>
+    <string name="edit">Редактировать</string>
+    <string name="addWord">Добавить новое</string>
+    <string name="qw">Значение слова не заполнено</string>
+    <string name="asd">Перевод не заполнен</string>
+    <string name="asdr">Перевод слова должен содержать значение слова через пробел или дефис!</string>
+    <string name="addnew">Add new</string>
+    <string name="delete">Удалить навсегда</string>
+    <string name="asddd">Удаление слова</string>
+    <string name="dasffsf">Удалить слово навсегда без возможности восстановления</string>
+    <string name="eqek">Для выхода нажмите еще раз</string>
+    <string name="kahskjas">Перевод</string>
+    <string name="edited">Edited</string>
+    <string name="removed_permanent">Removed permanently</string>
+    <string name="cancel">Отказываюсь</string>
+    <string name="confirm">Принимаю</string>
 </resources>
+
