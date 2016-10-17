@@ -1,15 +1,14 @@
 package com.example.user.ling;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.ActionMode;
@@ -18,10 +17,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.view.inputmethod.InputMethodSubtype;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -32,12 +30,14 @@ import android.widget.Toast;
 import com.example.user.ling.orm2.Configure;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
 
+import static android.R.id.list;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -48,45 +48,64 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+    private int mIndexComOut =0;
     private static final int DEFINITION = 333434 ;
-    private LinearLayout searsh_text;
-    private  boolean isText;
+    private LinearLayout mSsearshText;
+    private  boolean mIsText;
     public static List<MDictionary> mDictionaryList=new ArrayList<>();
-    private LinearLayout panelText;
-    private TextView textCore;
-    private View parentView;
-    private MyArrayAdapterWord adapter=null;
-    private RelativeLayout relativeLayout;
-    private LinearLayout panelButton;
-    private ListView listView;
-    private EditText editText;
-    private LinearLayout panelAbc;
+    private LinearLayout mPanelText;
+    private TextView mTextCore;
+    private View mParentView;
+    private MyArrayAdapterWord mAdapter =null;
+    private RelativeLayout mRelativeLayout;
+    private LinearLayout mPanelButton;
+    private ListView mListView;
+    private EditText mEditText;
+    private LinearLayout mPanelAbc;
 
 
     private android.view.ActionMode mActionMode;
 
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
 
+        menu.add(1,2,3,"Настройки").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                return false;
+            }
+        });
+        menu.add(1,2,3,"О программе").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                return false;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 
 
-        editText= (EditText) findViewById(R.id.find_word);
-        listView= (ListView) findViewById(R.id.list_view);
-        relativeLayout= (RelativeLayout) findViewById(R.id.relative_text);
-        panelButton= (LinearLayout) findViewById(R.id.panel_buton);
-        panelText= (LinearLayout) findViewById(R.id.text_panel);
-        textCore= (TextView) findViewById(R.id.text_core);
-        panelAbc= (LinearLayout) findViewById(R.id.panel_abc);
+
+        mEditText = (EditText) findViewById(R.id.find_word);
+        mListView = (ListView) findViewById(R.id.list_view);
+        mRelativeLayout = (RelativeLayout) findViewById(R.id.relative_text);
+        mPanelButton = (LinearLayout) findViewById(R.id.panel_buton);
+        mPanelText = (LinearLayout) findViewById(R.id.text_panel);
+        mTextCore = (TextView) findViewById(R.id.text_core);
+        mPanelAbc = (LinearLayout) findViewById(R.id.panel_abc);
 
 
-        textCore.setCustomSelectionActionModeCallback(new android.view.ActionMode.Callback() {
+        mTextCore.setCustomSelectionActionModeCallback(new android.view.ActionMode.Callback() {
 
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -110,15 +129,15 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case DEFINITION:
                         int min = 0;
-                        int max = textCore.getText().length();
-                        if (textCore.isFocused()) {
-                            final int selStart = textCore.getSelectionStart();
-                            final int selEnd = textCore.getSelectionEnd();
+                        int max = mTextCore.getText().length();
+                        if (mTextCore.isFocused()) {
+                            final int selStart = mTextCore.getSelectionStart();
+                            final int selEnd = mTextCore.getSelectionEnd();
 
                             min = Math.max(0, Math.min(selStart, selEnd));
                             max = Math.max(0, Math.max(selStart, selEnd));
                         }
-                        final String selectedText = textCore.getText().subSequence(min, max).toString();
+                        final String selectedText = mTextCore.getText().subSequence(min, max).toString();
                         translateCore(selectedText);
                         mode.finish();
                         return true;
@@ -129,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        textCore.setOnLongClickListener(new View.OnLongClickListener() {
+        mTextCore.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
                 MainActivity.this.startActionMode(new android.view.ActionMode.Callback() {
@@ -151,15 +170,15 @@ public class MainActivity extends AppCompatActivity {
                         switch (menuItem.getItemId()) {
                             case DEFINITION:
                                 int min = 0;
-                                int max =  textCore.getText().length();
-                                if (textCore.isFocused()) {
-                                    final int selStart = textCore.getSelectionStart();
-                                    final int selEnd = textCore.getSelectionEnd();
+                                int max =  mTextCore.getText().length();
+                                if (mTextCore.isFocused()) {
+                                    final int selStart = mTextCore.getSelectionStart();
+                                    final int selEnd = mTextCore.getSelectionEnd();
                                     min = Math.max(0, Math.min(selStart, selEnd));
                                     max = Math.max(0, Math.max(selStart, selEnd));
                                 }
                                 // Perform your definition lookup with the selected text
-                                final String selectedText = textCore.getText().subSequence(min, max).toString();
+                                final String selectedText = mTextCore.getText().subSequence(min, max).toString();
                                 translateCore(selectedText);
 
 
@@ -181,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        textCore.setOnClickListener(new View.OnClickListener() {
+        mTextCore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(mActionMode!=null){
@@ -191,15 +210,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        searsh_text= (LinearLayout)  findViewById(R.id.searsh_text);
+        mSsearshText = (LinearLayout)  findViewById(R.id.searsh_text);
 
-        parentView=findViewById(R.id.activity_main);
+        mParentView =findViewById(R.id.activity_main);
 
         findViewById(R.id.image_translate).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-
+                mIndexComOut=0;
                 DialogSearshWord selectText=new DialogSearshWord();
                 selectText.setDictionary(Utils.getSelectWordses());
                // selectText.notShowMenu();
@@ -211,21 +230,22 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.image_edit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                relativeLayout.setVisibility(View.VISIBLE);
-                panelButton.setVisibility(View.GONE);
+                mIndexComOut=0;
+                mRelativeLayout.setVisibility(View.VISIBLE);
+                mPanelButton.setVisibility(View.GONE);
                 Handler mHandler = new Handler();
                 mHandler.post(
                         new Runnable() {
                             public void run() {
                                 InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-                                inputMethodManager.toggleSoftInputFromWindow(editText.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
-                                editText.requestFocus();
-                                editText.setText("");
-                                if(isText){
+                                inputMethodManager.toggleSoftInputFromWindow(mEditText.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
+                                mEditText.requestFocus();
+                                mEditText.setText("");
+                                if(mIsText){
 
-                                    searsh_text.setVisibility(View.VISIBLE);
+                                    mSsearshText.setVisibility(View.VISIBLE);
                                 }else{
-                                    searsh_text.setVisibility(View.VISIBLE);
+                                    mSsearshText.setVisibility(View.VISIBLE);
                                 }
 
                             }
@@ -237,11 +257,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                String string = editText.getText().toString();
+                String string = mEditText.getText().toString();
                 if(string.trim().length()==0) return;
                 List<MDictionary> list= new ArrayList<>();
                 for (MDictionary word : mDictionaryList) {
-                    if(word.keyWord.toUpperCase().contains(editText.getText().toString().toUpperCase())){
+                    if(word.keyWord.toUpperCase().contains(mEditText.getText().toString().toUpperCase())){
                         list.add(word);
                     }
                 }
@@ -257,12 +277,7 @@ public class MainActivity extends AppCompatActivity {
         //mDictionaryList=Configure.getSession().getList(MDictionary.class," 1=1 ORDER BY keyWord ASC  ");
         new PreviewTask().execute();
 
-        Utils.indexSurogat=0;
-        for (MDictionary mDictionary : mDictionaryList) {
-            if(mDictionary.index>Utils.indexSurogat){
-                Utils.indexSurogat=mDictionary.index;
-            }
-        }
+
 
 
 
@@ -271,6 +286,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.bt_random).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mIndexComOut=0;
                 DialogWordRandom dialogWord=new DialogWordRandom();
                 int index=new Random().nextInt(mDictionaryList.size())-1;
                 dialogWord.setDictionary(mDictionaryList.get(index));
@@ -281,13 +297,14 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.bt_show_all).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                activateText(null,false);
+                mIndexComOut=0;
+                activateText(null,false,false);
                 listActivate(mDictionaryList);
             }
         });
 
 
-        editText.addTextChangedListener(new TextWatcher() {
+        mEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
@@ -302,11 +319,11 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
 
-                    if(!isText){
+                    if(!mIsText){
                         listActivate(listTemp);
                     }
                 }else{
-                    if(!isText){
+                    if(!mIsText){
                         listActivate(mDictionaryList);
                     }
                 }
@@ -316,7 +333,7 @@ public class MainActivity extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {}
         });
 
-        listView.setOnCreateContextMenuListener(this);
+        mListView.setOnCreateContextMenuListener(this);
 
 
        // listActivate(mDictionaryList);
@@ -326,8 +343,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onVisibilityChanged(boolean visible) {
                 if(!visible){
-                    panelButton.setVisibility(View.VISIBLE);
-                    relativeLayout.setVisibility(View.GONE);
+                    mPanelButton.setVisibility(View.VISIBLE);
+                    mRelativeLayout.setVisibility(View.GONE);
                 }
             }
         });
@@ -335,16 +352,32 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.image_text_list).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                File file=new File(Application.path2);
+                mIndexComOut=0;
+                File file=new File(Application.sPath2);
                 if(!file.exists()) return;
-                File[] files=file.listFiles();
+                final File[] files=file.listFiles();
+
+
+
+                List<File> files1=new ArrayList<File>(Arrays.asList(files));
+                Collections.sort(files1, new Comparator<File>() {
+                    @Override
+                    public int compare(File file, File t1) {
+                        return file.getPath().compareTo(t1.getPath());
+                    }
+                });
+                File[] files2=files1.toArray(new File[files1.size()]);
+
+
                 DialogSelectText dialog=new DialogSelectText();
                 dialog.setData(new DialogSelectText.ISelectText() {
                     @Override
                     public void activate(File file) {
-                        activateText(Utils.readFile(file.getPath()),true);
+                       String ex= file.getPath().substring(file.getPath().lastIndexOf('.')+1);
+                        boolean s=ex.trim().toUpperCase().endsWith("HTML");
+                        activateText(Utils.readFile(file.getPath()),true,s);
                     }
-                },files);
+                },files2);
                 dialog.show(getSupportFragmentManager(),"dsdd");
             }
         });
@@ -357,20 +390,19 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void action(Object o) {
 
+                        mIndexComOut=0;
                         for (MDictionary mDictionary : mDictionaryList) {
-                           if(mDictionary.isSelect){
-                               mDictionary.isSelect=false;
+                           if(mDictionary.isSelect()){
+                               mDictionary.setSelect(false);
                                Configure.getSession().update(mDictionary);
                            }
                         }
 
                         Toast.makeText(MainActivity.this, R.string.all_removed, Toast.LENGTH_SHORT).show();
-                       if(!isText){
-                           activateText(null,false);
+                       if(!mIsText){
+                           activateText(null,false,false);
                            listActivate(mDictionaryList);
                        }
-
-
                     }
                 });
             }
@@ -380,11 +412,19 @@ public class MainActivity extends AppCompatActivity {
     private void translateCore(String selectedText) {
         if(selectedText.trim().length()>0){
 
+            MDictionary one=null;
             List<MDictionary> dictionaryArrayList= new ArrayList<>();
             for (MDictionary mDictionary : mDictionaryList) {
-                if(mDictionary.valueWord.toUpperCase().contains(selectedText.toUpperCase())){
+                if(mDictionary.keyWord.toUpperCase().contains(selectedText.toUpperCase())){
                     dictionaryArrayList.add(mDictionary);
+                    if(mDictionary.keyWord.trim().toUpperCase().equals(selectedText.trim().toUpperCase())){
+                        one=mDictionary;
+                    }
                 }
+            }
+            if(one!=null&&dictionaryArrayList.size()>1){
+                dictionaryArrayList.remove(one);
+                dictionaryArrayList.add(0,one);
             }
             if(dictionaryArrayList.size()>0){
 
@@ -400,31 +440,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
-    void activateText(String text,boolean isShow){
-        isText=isShow;
+    void activateText(String text,boolean isShow,boolean isHTML){
+        mIsText =isShow;
         if(isShow){
-            textCore.setText(text);
-            panelText.setVisibility(View.VISIBLE);
-            listView.setVisibility(View.GONE);
-            panelAbc.setVisibility(View.GONE);
+            if(isHTML){
+                mTextCore.setText(Html.fromHtml(text));
+                mTextCore.setTextSize(15);
+            }else {
+                mTextCore.setText(text);
+                mTextCore.setTextSize(20);
+            }
+
+            mPanelText.setVisibility(View.VISIBLE);
+            mListView.setVisibility(View.GONE);
+            mPanelAbc.setVisibility(View.GONE);
         }else {
-            panelText.setVisibility(View.GONE);
-            listView.setVisibility(View.VISIBLE);
-            panelAbc.setVisibility(View.VISIBLE);
+            mPanelText.setVisibility(View.GONE);
+            mListView.setVisibility(View.VISIBLE);
+            mPanelAbc.setVisibility(View.VISIBLE);
         }
     }
 
+
     void listActivate(List<MDictionary> words){
-        adapter = new MyArrayAdapterWord(this, R.layout.simple_list_item_1, new ArrayList<>(words));
-        listView.setAdapter(adapter);
+        mAdapter = new MyArrayAdapterWord(this, R.layout.simple_list_item_1, new ArrayList<>(words));
+        mListView.setAdapter(mAdapter);
     }
 
 
     public void setListenerToRootView(final IKeyboardVisibilityListener listener) {
 
-        parentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        mParentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
             private boolean alreadyOpen;
             private final int defaultKeyboardHeightDP = 100;
@@ -434,9 +480,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onGlobalLayout() {
 
-                int estimatedKeyboardHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, EstimatedKeyboardDP, parentView.getResources().getDisplayMetrics());
-                parentView.getWindowVisibleDisplayFrame(rect);
-                int heightDiff = parentView.getRootView().getHeight() - (rect.bottom - rect.top);
+                int estimatedKeyboardHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, EstimatedKeyboardDP, mParentView.getResources().getDisplayMetrics());
+                mParentView.getWindowVisibleDisplayFrame(rect);
+                int heightDiff = mParentView.getRootView().getHeight() - (rect.bottom - rect.top);
                 boolean isShown = heightDiff >= estimatedKeyboardHeight;
 
                 if (isShown == alreadyOpen) {
@@ -450,42 +496,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public  void notifyE() {
-        if(adapter!=null){
-           // activateText(null,false);
-           // listActivate(mDictionaryList);
-            adapter.notifyDataSetChanged();
+    public  void listRefrash() {
+        if(mAdapter !=null){
+            mAdapter.notifyDataSetInvalidated();
         }
     }
-
-
-    public  void listRefrach() {
-        if(adapter!=null){
-             activateText(null,false);
-             listActivate(mDictionaryList);
-            //adapter.notifyDataSetChanged();
-        }
-    }
-
 
 
     private void createListABC() {
         ListView listViewE = (ListView) findViewById(R.id.listView_alphavit);
 
-        List<MDictionary> mD=new ArrayList<>(Utils.listABC.length);
-        for (String s : Utils.listABC) {
+        List<MDictionary> mD=new ArrayList<>(Utils.sListABC.length);
+        for (String s : Utils.sListABC) {
             MDictionary d=new MDictionary();
             d.valueWord=s;
             mD.add(d);
         }
 
-
-        MyArrayAdapterWord aa = new MyArrayAdapterWord(this, R.layout.simple_list_item_2, new ArrayList<>(mD));
-        listViewE.setAdapter(aa);
+        listViewE.setAdapter(new MyArrayAdapterWord(this, R.layout.simple_list_item_2, new ArrayList<>(mD)));
         listViewE.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String string = Utils.listABC[position];
+                String string = Utils.sListABC[position];
                 List<MDictionary> dictionaryList=new ArrayList<>();
                 for (MDictionary dictionary : mDictionaryList) {
                     char d=dictionary.keyWord.trim().toUpperCase().charAt(0);
@@ -508,19 +540,19 @@ public class MainActivity extends AppCompatActivity {
         AdapterView.AdapterContextMenuInfo aMenuInfo = (AdapterView.AdapterContextMenuInfo) menuInfo;
         final int position = aMenuInfo.position;
 
-        if(adapter!=null){
-            final MDictionary mDictionary = adapter.getItem(position);
-            if(!mDictionary.isSelect){
+        if(mAdapter !=null){
+            final MDictionary mDictionary = mAdapter.getItem(position);
+            if(!(mDictionary != null ? mDictionary.isSelect() : false)){
                 menu.add(R.string.add).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
-                        mDictionary.isSelect=true;
-                        mDictionary.index=++Utils.indexSurogat;
+                        mDictionary.setSelect(true);
+
                         Configure.getSession().update(mDictionary);
-                        for(int i = 0;i<listView.getChildCount();i++){
-                            MDictionary dictionary = ((MDictionary) listView.getChildAt(i).getTag());
+                        for(int i = 0; i< mListView.getChildCount(); i++){
+                            MDictionary dictionary = ((MDictionary) mListView.getChildAt(i).getTag());
                             if(dictionary.id==mDictionary.id){
-                                listView.getChildAt(i).findViewById(R.id.red_star).setVisibility(View.VISIBLE);
+                                mListView.getChildAt(i).findViewById(R.id.red_star).setVisibility(View.VISIBLE);
                             }
                         }
                         Toast.makeText(MainActivity.this, R.string.add, Toast.LENGTH_SHORT).show();
@@ -530,17 +562,17 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-            if(mDictionary.isSelect){
+            if(mDictionary.isSelect()){
                 menu.add(R.string.remove).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
-                        mDictionary.isSelect=false;
-                        mDictionary.index=0;
+                        mDictionary.setSelect(false);
+
                         Configure.getSession().update(mDictionary);
-                        for(int i = 0;i<listView.getChildCount();i++){
-                            MDictionary dd = ((MDictionary) listView.getChildAt(i).getTag());
+                        for(int i = 0; i< mListView.getChildCount(); i++){
+                            MDictionary dd = ((MDictionary) mListView.getChildAt(i).getTag());
                             if(dd.id==mDictionary.id){
-                                listView.getChildAt(i).findViewById(R.id.red_star).setVisibility(View.INVISIBLE);
+                                mListView.getChildAt(i).findViewById(R.id.red_star).setVisibility(View.INVISIBLE);
                             }
                         }
                         Toast.makeText(MainActivity.this, R.string.removed, Toast.LENGTH_SHORT).show();
@@ -553,11 +585,11 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
                     DialogEditWord editWord=new DialogEditWord();
-                    editWord.setWord(mDictionary);
+                    editWord.setmWord(mDictionary);
                     editWord.setIAction(new IAction() {
                         @Override
                         public void action(Object o) {
-                            adapter.notifyDataSetChanged();
+                            mAdapter.notifyDataSetChanged();
                         }
                     });
                     editWord.show(getSupportFragmentManager(),"ada");
@@ -575,7 +607,8 @@ public class MainActivity extends AppCompatActivity {
                         public void action(Object o) {
                             Configure.getSession().insert(o);
                             mDictionaryList.add((MDictionary) o);
-                            adapter.notifyDataSetChanged();
+                            mAdapter.add((MDictionary) o);
+                            mAdapter.notifyDataSetInvalidated();
                             Toast.makeText(MainActivity.this, R.string.addnew, Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -584,58 +617,37 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
+            final Parcelable[] state = new Parcelable[1];
             menu.add(R.string.delete).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
                     Utils.messageBox(getString(R.string.asddd), getString(R.string.dasffsf), MainActivity.this, new IAction() {
                         @Override
                         public void action(Object o) {
+                           state[0] = mListView.onSaveInstanceState();
                             mDictionaryList.remove(mDictionary);
                             Configure.getSession().delete(mDictionary);
-                            activateText(null,false);
-                            listActivate(mDictionaryList);
+                            mAdapter.remove(mDictionary);
+                            mAdapter.notifyDataSetInvalidated();
                             Toast.makeText(MainActivity.this, R.string.removed_permanent , Toast.LENGTH_SHORT).show();
+                            mListView.onRestoreInstanceState(state[0]);
                         }
                     });
                         return false;
                 }
             });
 
-        }else{
-            if(isText) return;
-            String string=((TextView)aMenuInfo.targetView).getText().toString();
-            final List<MDictionary> list = Configure.getSession().getList(MDictionary.class," is_select = 1 and valueWord = '"+ string+"'");
-            menu.add(R.string.remove).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem menuItem) {
-                    for (MDictionary dictionary : list) {
-                        dictionary.isSelect=false;
-                        Configure.getSession().update(dictionary);
-                    }
-                    ////////////////////////
-                    activateText(null,false);
-                    adapter=null;
-                    String[] array = new String[Utils.getSelectWordses().size()];
-                    for(int i=0;i<Utils.getSelectWordses().size();i++){
-                        array[i]=Utils.getSelectWordses().get(i).valueWord;
-                    }
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1, array);
-                    listView.setAdapter(adapter);
-                    //////////////////////////
-                    Toast.makeText(MainActivity.this, R.string.removed, Toast.LENGTH_SHORT).show();
-                    return false;
-                }
-            });
         }
+
     }
 
-    int index=0;
+
     @Override
     public void onBackPressed() {
-        if(++index<2){
+        if(++mIndexComOut <2){
             Toast.makeText(this, R.string.eqek, Toast.LENGTH_SHORT).show();
         }else {
-            index=0;
+            mIndexComOut =0;
             finish();
 
         }
@@ -652,6 +664,13 @@ public class MainActivity extends AppCompatActivity {
                 mDictionaryList=mDictionaries;
             listActivate(mDictionaries);
             createListABC();
+
+            Utils.sIndexSurogat =0;
+            for (MDictionary mDictionary : mDictionaryList) {
+                if(mDictionary.index>Utils.sIndexSurogat){
+                    Utils.sIndexSurogat =mDictionary.index;
+                }
+            }
             MainActivity.this.findViewById(R.id.panel_buton_top).setVisibility(View.VISIBLE);
         }
 
