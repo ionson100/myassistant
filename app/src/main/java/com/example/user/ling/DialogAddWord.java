@@ -16,13 +16,13 @@ import android.widget.Toast;
 public class DialogAddWord extends DialogFragment {
 
 
-    private EditText key;
-    private EditText value;
-    private IAction iAction;
+    private EditText mKey;
+    private EditText mValue;
+    private IAction mIAction;
 
     public void setIAction(IAction iAction) {
 
-        this.iAction = iAction;
+        this.mIAction = iAction;
     }
 
     @NonNull
@@ -33,8 +33,8 @@ public class DialogAddWord extends DialogFragment {
         LayoutInflater vi;
         vi = LayoutInflater.from(getActivity());
         View v = vi.inflate(R.layout.dialog_add_word, null);
-        key= (EditText) v.findViewById(R.id.key_word);
-        value= (EditText) v.findViewById(R.id.value_word);
+        mKey = (EditText) v.findViewById(R.id.key_word);
+        mValue = (EditText) v.findViewById(R.id.value_word);
         v.findViewById(R.id.bt_add_save).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -48,24 +48,24 @@ public class DialogAddWord extends DialogFragment {
     }
 
     private void save() {
-        if(key.getText().toString().trim().length()==0){
+        if(mKey.getText().toString().trim().length()==0){
             Toast.makeText(getContext(), R.string.qw, Toast.LENGTH_SHORT).show();
             return;
         }
-        if(value.getText().toString().trim().length()==0){
+        if(mValue.getText().toString().trim().length()==0){
             Toast.makeText(getContext(), R.string.asd, Toast.LENGTH_SHORT).show();
             return;
         }
-        if(!value.getText().toString().toUpperCase().contains(key.getText().toString().toUpperCase())){
+        if(!mValue.getText().toString().toUpperCase().contains(mKey.getText().toString().toUpperCase())){
             Toast.makeText(getContext(), R.string.asdr, Toast.LENGTH_SHORT).show();
             return;
         }
         MDictionary mDictionary=new MDictionary();
-        mDictionary.keyWord=key.getText().toString();
-        mDictionary.valueWord=value.getText().toString();
-        mDictionary.isSelect=true;
-        mDictionary.index=++Utils.indexSurogat;
-        iAction.action(mDictionary);
+        mDictionary.keyWord= mKey.getText().toString();
+        mDictionary.valueWord= mValue.getText().toString();
+        mDictionary.setSelect(true);
+
+        mIAction.action(mDictionary);
         dismiss();
     }
 

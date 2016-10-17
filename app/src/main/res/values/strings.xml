@@ -24,5 +24,6 @@
     <string name="removed_permanent">Removed permanently</string>
     <string name="cancel">Отказываюсь</string>
     <string name="confirm">Принимаю</string>
+    <string name="error3">Ошибка добавления</string>
 </resources>
 

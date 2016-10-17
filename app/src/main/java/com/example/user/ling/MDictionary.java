@@ -20,8 +20,23 @@ public class MDictionary {
     public String valueWord;
 
     @Column("is_select")
-    public boolean isSelect;
+    private boolean isSelect;
 
     @Column("index_surogate")
     public int index;
+
+
+    public boolean isSelect() {
+        return isSelect;
+    }
+
+    public void setSelect(boolean select) {
+        isSelect = select;
+        if(select){
+            index=++Utils.sIndexSurogat;
+        }else{
+            index=0;
+        }
+        Utils.zerabledSelect();
+    }
 }

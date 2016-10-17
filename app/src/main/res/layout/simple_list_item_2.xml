@@ -6,9 +6,10 @@
     android:layout_height="match_parent">
 
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+
         android:text="sdkj"
-        android:textSize="20dp"
-        android:textColor="@android:color/black"
+        android:textSize="12dp"
+        android:textColor="@color/text_color_abc"
         android:id="@+id/text_word"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

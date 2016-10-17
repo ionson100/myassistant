@@ -4,5 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="panelColor">#fcfcfa</color>
-    <color name="alphavitPanel">#ece9e9</color>
+    <color name="alphavitPanel">#ffffff</color>
+    <color name="text_color_abc">#807e7e</color>
 </resources>

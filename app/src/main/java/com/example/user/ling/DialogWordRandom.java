@@ -15,7 +15,7 @@ import com.example.user.ling.orm2.Table;
 
 public class DialogWordRandom extends DialogFragment {
 
-    MDictionary mDictionary;
+    private MDictionary mDictionary;
 
     public void setDictionary(MDictionary dictionary){
         this.mDictionary=dictionary;
@@ -34,8 +34,8 @@ public class DialogWordRandom extends DialogFragment {
             @Override
             public void onClick(View view) {
                 if(mDictionary.valueWord.trim().length()>0){
-                    mDictionary.isSelect=true;
-                    mDictionary.index=++Utils.indexSurogat;
+                    mDictionary.setSelect(true);
+
                     Configure.getSession().update(mDictionary);
                     Toast.makeText(getContext(), R.string.add, Toast.LENGTH_SHORT).show();
                 }

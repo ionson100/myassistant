@@ -3,16 +3,8 @@ package com.example.user.ling;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.view.inputmethod.InputMethodManager;
-import android.view.inputmethod.InputMethodSubtype;
-import android.widget.Toast;
 
-import com.example.user.ling.orm2.Configure;
-import com.example.user.ling.orm2.ISession;
 import com.example.user.ling.tranlate.Language;
 import com.example.user.ling.tranlate.Translate;
 import com.google.gson.Gson;
@@ -24,32 +16,35 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
-
-import static android.view.View.Z;
 
 
 public class Utils {
 
-    public static int indexSurogat;
-    public static final String[] listABC = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","Y","Z" };
+    static int sIndexSurogat;
+    static final String[] sListABC = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","Y","Z" };
 
+    public static void zerabledSelect(){
+        selectList=null;
+    }
+    private static List<MDictionary> selectList;
     synchronized static List<MDictionary> getSelectWordses(){
 
-        List<MDictionary> res=new ArrayList<>();
-        for (MDictionary mDictionary : MainActivity.mDictionaryList) {
-            if(mDictionary.isSelect){
-                res.add(mDictionary);
+        if(selectList==null){
+            selectList =new ArrayList<>();
+            for (MDictionary mDictionary : MainActivity.mDictionaryList) {
+                if(mDictionary.isSelect()){
+                    selectList.add(mDictionary);
+                }
             }
+            Collections.sort(selectList, new Comparator<MDictionary>() {
+                @Override
+                public int compare(MDictionary mDictionary, MDictionary t1) {
+                    return Integer.compare(mDictionary.index,t1.index);
+                }
+            });
         }
-        Collections.sort(res, new Comparator<MDictionary>() {
-            @Override
-            public int compare(MDictionary mDictionary, MDictionary t1) {
-                return Integer.compare(mDictionary.index,t1.index);
-            }
-        });
-       // List<MDictionary> as=Configure.getSession().getList(MDictionary.class," is_select = 1 ");
-            return res;
+
+            return selectList;
     }
 
 
@@ -152,6 +147,7 @@ public class Utils {
                 stringBuilder.append(string).append("\n");
             }
             MDictionary mDictionary=new MDictionary();
+            mDictionary.keyWord=selectedText;
             mDictionary.valueWord=stringBuilder.toString();
             dictionaryArrayList.add(mDictionary);
         }catch (Exception ex){

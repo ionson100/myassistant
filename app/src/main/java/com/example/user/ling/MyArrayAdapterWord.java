@@ -14,39 +14,30 @@ import java.util.List;
 import static com.example.user.ling.R.id.red_star;
 
 
-public class MyArrayAdapterWord extends ArrayAdapter<MDictionary> {
+class MyArrayAdapterWord extends ArrayAdapter<MDictionary> {
 
+    private final int mResource;
 
-    private final int resource;
-
-    public MyArrayAdapterWord(Context context, int resource, List<MDictionary> objects) {
+    MyArrayAdapterWord(Context context, int resource, List<MDictionary> objects) {
         super(context, resource, objects);
-
-        this.resource = resource;
+        this.mResource = resource;
     }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View mView = convertView;
-
         final MDictionary p = getItem(position);
-
-            LayoutInflater vi;
-            vi = LayoutInflater.from(getContext());
-            mView = vi.inflate(resource, null);
+        View mView =  LayoutInflater.from(getContext()).inflate(mResource, null);
         TextView text_word= (TextView) mView.findViewById(R.id.text_word);
         ImageView imageView= (ImageView) mView.findViewById(red_star);
+        assert p != null;
         text_word.setText(p.valueWord);
         if(imageView!=null){
-            if(p.isSelect){
+            if(p.isSelect()){
                 imageView.setVisibility(View.VISIBLE);
             }else{
                 imageView.setVisibility(View.INVISIBLE);
             }
         }
         mView.setTag(p);
-
-
         return mView;
     }
-
 }

@@ -5,13 +5,14 @@
     android:background="@drawable/cat"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     android:orientation="vertical"
     tools:context="com.example.user.ling.MainActivity">
-    <!--android:visibility="gone"-->
+
+
+    <!---->
     <LinearLayout
         android:background="@color/panelColor"
-
+        android:visibility="gone"
         android:id="@+id/panel_buton_top"
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -30,7 +31,7 @@
                 android:orientation="vertical"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.93">
+                android:layout_weight="0.95">
                 <ListView
                     android:id="@+id/list_view"
                     android:layout_width="match_parent"
@@ -62,7 +63,7 @@
                 android:id="@+id/panel_abc"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.07"
+                android:layout_weight="0.05"
                 android:baselineAligned="false">
                 <ListView
                     android:id="@+id/listView_alphavit"
@@ -71,8 +72,8 @@
                     android:layout_marginRight="0dp"
                     android:layout_weight="0.05"
                     android:background="@color/alphavitPanel"
-                    android:divider="#ff2b00"
-                    android:dividerHeight="2dp"
+                    android:divider="#e2e1e1"
+                    android:dividerHeight="1sp"
                     android:listSelector="@drawable/listitem_selector" />
 
             </LinearLayout>
