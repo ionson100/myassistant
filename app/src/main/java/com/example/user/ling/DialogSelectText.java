@@ -12,7 +12,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.io.File;
-
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class DialogSelectText extends DialogFragment {
@@ -40,23 +41,38 @@ public class DialogSelectText extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater vi;
         vi = LayoutInflater.from(getActivity());
-        View v = vi.inflate(R.layout.dialog_select_text, null);
-        ListView listView= (ListView) v.findViewById(R.id.list_view_text);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, mStrings);
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-               mISelectText.activate(mFiles[position]);
-                dismiss();
+        final View v = vi.inflate(R.layout.dialog_select_text, null);
+        final ListView listView= (ListView) v.findViewById(R.id.list_view_text);
+        final ArrayAdapterFolderText adapter = new ArrayAdapterFolderText(getContext(), 0, new ArrayList<>(Arrays.asList(mFiles)), new IAction() {
+            @Override
+            public void action(Object o) {
+                recursionShowFolders((File) o,  listView);
             }
         });
+        listView.setAdapter(adapter);
+
         builder.setView(v);
         return builder.create();
     }
+
+    private void recursionShowFolders(File o, final ListView listView) {
+        File file= o;
+        if(file.isDirectory()==false){
+            mISelectText.activate(file);
+        }else{
+            ArrayAdapterFolderText adapter = new ArrayAdapterFolderText(getContext(), 0, new ArrayList<>(Arrays.asList(Utils.getArrayFiles(file))), new IAction() {
+                @Override
+                public void action(Object o) {
+                    recursionShowFolders((File) o,  listView);
+                }
+            });
+            listView.setAdapter(adapter);
+        }
+    }
+
 
     public interface ISelectText{
         void activate(File file);

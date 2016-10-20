@@ -4,15 +4,24 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.res.AssetManager;
+import android.graphics.Point;
+import android.support.v4.app.FragmentActivity;
+import android.text.Html;
+import android.view.Display;
 
 import com.example.user.ling.tranlate.Language;
 import com.example.user.ling.tranlate.Translate;
 import com.google.gson.Gson;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -135,7 +144,12 @@ public class Utils {
         String translatedText="";
         try {
             Translate.setKey("trnsl.1.1.20161006T095643Z.9887c471401acf62.edb45ac820c51c1dc67ee16076cb0390c4806133");
-            translatedText = Translate.execute(selectedText, Language.ENGLISH, Language.RUSSIAN,activity);
+            if(Settings.core().directTraslate==false){
+                translatedText = Translate.execute(selectedText, Language.ENGLISH, Language.RUSSIAN,activity);
+            }else{
+                translatedText = Translate.execute(selectedText, Language.RUSSIAN, Language.ENGLISH,activity);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -156,6 +170,74 @@ public class Utils {
             dictionaryArrayList.add(mDictionary);
         }
     }
+    public static void showHelpNote(Activity activity, String s) {
+        AssetManager am = activity.getAssets();
+        InputStream is = null;
+        try {
+            is = am.open(s);
+        } catch (IOException ignored) {
+            return;
+        }
+        BufferedReader r = new BufferedReader(new InputStreamReader(is));
+        StringBuilder total = new StringBuilder();
+        String line;
+        try {
+            while ((line = r.readLine()) != null) {
+                total.append(line).append('\n');
+            }
+        } catch (IOException ignored) {
+            return;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder
+                .setMessage(Html.fromHtml(total.toString()))
+                .setIcon(android.R.drawable.ic_dialog_info);
+        builder.setPositiveButton(activity.getString(R.string.close), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+        Display display = activity.getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
+        int height = size.y;
+        alert.getWindow().setLayout(width-30, height-30);
+
+    }
+
+    public static File[] getArrayFiles(File  fi){
+
+        if(!fi.exists()) return null;
+
+        List<File> filesFolder= new ArrayList<>();
+        List<File> filesCore= new ArrayList<>();
+        for (File file : fi.listFiles()) {
+            if(file.isDirectory()){
+                filesFolder.add(file);
+            }else{
+                filesCore.add(file);
+            }
+        }
+
+        Collections.sort(filesCore, new Comparator<File>() {
+            @Override
+            public int compare(File file, File t1) {
+                return file.getPath().compareTo(t1.getPath());
+            }
+        });
+
+        filesFolder.addAll(filesCore);
+
+
+
+        return filesFolder.toArray(new File[filesFolder.size()]);
+
+    }
+
 }
 
 interface IAction{

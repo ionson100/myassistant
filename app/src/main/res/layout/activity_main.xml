@@ -33,6 +33,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="0.95">
                 <ListView
+                    android:divider="@color/list_dict_bount"
+                    android:dividerHeight="2dp"
                     android:id="@+id/list_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
@@ -44,6 +46,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
                     <ScrollView
+                        android:id="@+id/scrol_text"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
                         <TextView
@@ -82,6 +85,7 @@
 
         </LinearLayout>
         <LinearLayout
+            android:background="@color/panel_buttons"
             android:id="@+id/panel_buton"
             android:minHeight="40dp"
             android:layout_weight="0.1"
@@ -100,7 +104,7 @@
                 <ImageButton
                     android:id="@+id/image_delete_select_word"
                     android:background="@null"
-                    android:src="@drawable/ic_delete"
+                    android:src="@drawable/selct_delet"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:contentDescription="ass" />
@@ -116,7 +120,7 @@
                 <ImageButton
                     android:id="@+id/image_translate"
                     android:background="@null"
-                    android:src="@drawable/translate"
+                    android:src="@drawable/select_translate"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:contentDescription="ass5" />
@@ -132,7 +136,7 @@
                 <ImageButton
                     android:id="@+id/image_text_list"
                     android:background="@null"
-                    android:src="@drawable/ic_list"
+                    android:src="@drawable/select_list_file"
                     android:layout_width="50dp"
                     android:layout_height="50dp" />
             </LinearLayout>
@@ -148,7 +152,7 @@
                 <ImageButton
                     android:id="@+id/image_edit"
                     android:background="@null"
-                    android:src="@drawable/ic_edit"
+                    android:src="@drawable/select_edit"
                     android:layout_width="50dp"
                     android:layout_height="50dp" />
             </LinearLayout>
@@ -161,7 +165,7 @@
                 <ImageButton
                     android:id="@+id/bt_random"
                     android:background="@null"
-                    android:src="@drawable/ic_random"
+                    android:src="@drawable/select_random"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:contentDescription="ass4" />
@@ -175,7 +179,7 @@
                 <ImageButton
                     android:id="@+id/bt_show_all"
                     android:background="@null"
-                    android:src="@drawable/ic_action_name"
+                    android:src="@drawable/select_action_name"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:contentDescription="ass2" />

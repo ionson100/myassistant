@@ -21,6 +21,7 @@ import java.util.List;
 
 public class DialogSearshWord extends DialogFragment {
 
+  //  boolean refrash=false;
     private List<MDictionary> mDictionaryList;
 
 
@@ -30,6 +31,14 @@ public class DialogSearshWord extends DialogFragment {
 
     private MyArrayAdapterWord mAdapter;
 
+//    @Override
+//    public void onDestroy() {
+//        super.onDestroy();
+//        if(refrash){
+//            ((MainActivity)getActivity()).refrashScrol();
+//        }
+//
+//    }
 
     @NonNull
     @Override
@@ -58,17 +67,19 @@ public class DialogSearshWord extends DialogFragment {
                                     mDictionary.setSelect(true);
                                     Configure.getSession().insert(mDictionary);
                                     MainActivity.mDictionaryList.add(mDictionary);
-                                    Toast.makeText(getContext(), R.string.add, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), R.string.addin, Toast.LENGTH_SHORT).show();
                                     mAdapter.notifyDataSetInvalidated();
+                                    ((MainActivity)getActivity()).listRefrash();
                                 }else{
                                     Toast.makeText(getContext(), R.string.error3, Toast.LENGTH_SHORT).show();
                                 }
                             }else {
                                 mDictionary.setSelect(true);
                                 Configure.getSession().update(mDictionary);
-                                Toast.makeText(getContext(), R.string.add, Toast.LENGTH_SHORT).show();
-                                return false;
+                                ((MainActivity)getActivity()).listRefrash();
+                                Toast.makeText(getContext(), R.string.addin, Toast.LENGTH_SHORT).show();
                             }
+                          //  refrash=true;
                             return false;
 
                         }
@@ -78,14 +89,12 @@ public class DialogSearshWord extends DialogFragment {
                         @Override
                         public boolean onMenuItemClick(MenuItem menuItem) {
                             mDictionary.setSelect(false);
-
                             mDictionaryList.remove(mDictionary);
                             Configure.getSession().update(mDictionary);
                             mAdapter.notifyDataSetChanged();
-                            ((MainActivity)getActivity()).listRefrash();
                             Toast.makeText(getContext(), R.string.removed, Toast.LENGTH_SHORT).show();
-
-
+                            ((MainActivity)getActivity()).listRefrash();
+                          //  refrash=true;
                             return false;
                         }
                     });
@@ -101,12 +110,14 @@ public class DialogSearshWord extends DialogFragment {
                                 public void action(Object o) {
                                     Configure.getSession().update(o) ;
                                     mAdapter.notifyDataSetChanged();
-                                    ((MainActivity)getActivity()).listRefrash();
+
                                     Toast.makeText(getContext(), R.string.edited, Toast.LENGTH_SHORT).show();
+                                    ((MainActivity)getActivity()).listRefrash();
                                 }
                             });
 
                             editWord.show(getActivity().getSupportFragmentManager(),"ada");
+                           // refrash=true;
                             return false;
 
                         }
@@ -126,13 +137,14 @@ public class DialogSearshWord extends DialogFragment {
                                 MainActivity.mDictionaryList.add(0,(MDictionary) o);
                                 mDictionaryList.add((MDictionary) o);
 
-                                 ((MainActivity)getActivity()).listRefrash();
+
                                  mAdapter.notifyDataSetInvalidated();
+                                ((MainActivity)getActivity()).listRefrash();
                                  Toast.makeText(getContext(), R.string.addnew, Toast.LENGTH_SHORT).show();
                             }
                         });
                         editWord.show(getActivity().getSupportFragmentManager(),"ada");
-
+                      //  refrash=true;
                         return false;
                     }
                 });
@@ -151,9 +163,11 @@ public class DialogSearshWord extends DialogFragment {
                                     ((MainActivity)getActivity()).listRefrash();
                                     mAdapter.notifyDataSetInvalidated();
                                     Toast.makeText(getContext(), R.string.removed_permanent, Toast.LENGTH_SHORT).show();
+                                    ((MainActivity)getActivity()).listRefrash();
 
                                 }
                             });
+                         //   refrash=true;
                             return false;
                         }
                     });

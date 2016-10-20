@@ -25,5 +25,19 @@
     <string name="cancel">Отказываюсь</string>
     <string name="confirm">Принимаю</string>
     <string name="error3">Ошибка добавления</string>
+    <string name="direct_translate">Engl->Russ,Russ->Engl</string>
+    <string name="direct_translate_titl">Направление перевода Yandex</string>
+    <string name="dsynch_translate_titl">Поиск в локальном словаре</string>
+    <string name="synch_translate">Engl  Russ</string>
+    <string name="close">Закрыть</string>
+    <string name="settings_name">Настройки</string>
+    <string name="help_name">Справка</string>
+    <string name="about">О программе</string>
+    <string name="paint_word_titl">Выделять мои слова</string>
+    <string name="stiry">История слов</string>
+    <string name="close_app">Закрыть</string>
+    <string name="addin">Added</string>
+    <string name="color_select_word">Цвет выделенных слов</string>
+    <string name="yandex">Яндекс</string>
 </resources>
 

@@ -4,6 +4,8 @@ import com.example.user.ling.orm2.Column;
 import com.example.user.ling.orm2.PrimaryKey;
 import com.example.user.ling.orm2.Table;
 
+import java.util.Date;
+
 
 @Table("dictionary")
 public class MDictionary {
@@ -25,6 +27,9 @@ public class MDictionary {
     @Column("index_surogate")
     public int index;
 
+    @Column("index_story")
+    public long indexStory;
+
 
     public boolean isSelect() {
         return isSelect;
@@ -34,9 +39,11 @@ public class MDictionary {
         isSelect = select;
         if(select){
             index=++Utils.sIndexSurogat;
+            indexStory=new Date().getTime();
         }else{
             index=0;
         }
         Utils.zerabledSelect();
+
     }
 }

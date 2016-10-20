@@ -24,24 +24,21 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.user.ling.orm2.Configure;
-
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
-import static android.R.id.list;
-
+import static android.R.attr.max;
+import static android.R.attr.mode;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int YANDEX = 29247;
 
     interface IKeyboardVisibilityListener {
         void onVisibilityChanged(boolean visible);
@@ -70,15 +67,54 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        menu.add(1,2,3,"Настройки").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        menu.add(R.string.settings_name).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
+
+                DialogSettings dialogSettings=new DialogSettings();
+                dialogSettings.show(getSupportFragmentManager(),"set");
                 return false;
             }
         });
-        menu.add(1,2,3,"О программе").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        menu.add(R.string.stiry).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
+               List<MDictionary> list=Configure.getSession().getList(MDictionary.class," index_story > 0 order by index_story ");
+                DialogSearshWord selectText=new DialogSearshWord();
+                selectText.setDictionary(list);
+                selectText.show(getSupportFragmentManager(),"skdsjf");
+                return false;
+            }
+        });
+
+        menu.add(R.string.help_name).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                Utils.showHelpNote(MainActivity.this,"help.html");
+                return false;
+            }
+        });
+
+        menu.add(R.string.addWord).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                addNewWord();
+                return false;
+            }
+        });
+
+        menu.add(R.string.about).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                Utils.showHelpNote(MainActivity.this,"about.html");
+                return false;
+            }
+        });
+
+        menu.add(R.string.close_app).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                MainActivity.this.finish();
                 return false;
             }
         });
@@ -93,9 +129,6 @@ public class MainActivity extends AppCompatActivity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-
-
-
         mEditText = (EditText) findViewById(R.id.find_word);
         mListView = (ListView) findViewById(R.id.list_view);
         mRelativeLayout = (RelativeLayout) findViewById(R.id.relative_text);
@@ -104,19 +137,19 @@ public class MainActivity extends AppCompatActivity {
         mTextCore = (TextView) findViewById(R.id.text_core);
         mPanelAbc = (LinearLayout) findViewById(R.id.panel_abc);
 
-
         mTextCore.setCustomSelectionActionModeCallback(new android.view.ActionMode.Callback() {
 
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                menu.removeItem(android.R.id.selectAll);
-                menu.removeItem(android.R.id.cut);
-                menu.removeItem(android.R.id.copy);
+//                menu.removeItem(android.R.id.selectAll);
+//                menu.removeItem(android.R.id.cut);
+//                menu.removeItem(android.R.id.copy);
                 return true;
             }
 
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                menu.add(0, YANDEX, 0, R.string.yandex).setIcon(R.drawable.yandex);
                 menu.add(0, DEFINITION, 0, R.string.kahskjas).setIcon(R.drawable.ic_translator);
                 return true;
             }
@@ -127,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 switch (item.getItemId()) {
-                    case DEFINITION:
+                    case DEFINITION:{
                         int min = 0;
                         int max = mTextCore.getText().length();
                         if (mTextCore.isFocused()) {
@@ -141,6 +174,24 @@ public class MainActivity extends AppCompatActivity {
                         translateCore(selectedText);
                         mode.finish();
                         return true;
+                    }
+
+                    case YANDEX:{
+                        int min = 0;
+                        int max = mTextCore.getText().length();
+                        if (mTextCore.isFocused()) {
+                            final int selStart = mTextCore.getSelectionStart();
+                            final int selEnd = mTextCore.getSelectionEnd();
+
+                            min = Math.max(0, Math.min(selStart, selEnd));
+                            max = Math.max(0, Math.max(selStart, selEnd));
+                        }
+                        final String selectedText = mTextCore.getText().subSequence(min, max).toString();
+                        translateYandex(selectedText);
+                        mode.finish();
+                        return true;
+                    }
+
                     default:
                         break;
                 }
@@ -154,7 +205,8 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.startActionMode(new android.view.ActionMode.Callback() {
                     @Override
                     public boolean onCreateActionMode(android.view.ActionMode actionMode, Menu menu) {
-                        menu.add(0, DEFINITION, 0, "Definition").setIcon(R.drawable.ic_translator);
+                        menu.add(0, YANDEX, 0, R.string.yandex).setIcon(R.drawable.yandex);
+                        menu.add(0, DEFINITION, 0, R.string.kahskjas).setIcon(R.drawable.ic_translator);
                         mActionMode=actionMode;
                         return true;
                     }
@@ -168,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onActionItemClicked(android.view.ActionMode actionMode, MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
-                            case DEFINITION:
+                            case DEFINITION:{
                                 int min = 0;
                                 int max =  mTextCore.getText().length();
                                 if (mTextCore.isFocused()) {
@@ -185,6 +237,23 @@ public class MainActivity extends AppCompatActivity {
                                 // Finish and close the ActionMode
                                 actionMode.finish();
                                 return true;
+                            }
+                            case YANDEX:{
+                                int min = 0;
+                                int max = mTextCore.getText().length();
+                                if (mTextCore.isFocused()) {
+                                    final int selStart = mTextCore.getSelectionStart();
+                                    final int selEnd = mTextCore.getSelectionEnd();
+
+                                    min = Math.max(0, Math.min(selStart, selEnd));
+                                    max = Math.max(0, Math.max(selStart, selEnd));
+                                }
+                                final String selectedText = mTextCore.getText().subSequence(min, max).toString();
+                                translateYandex(selectedText);
+                                actionMode.finish();
+                                return true;
+                            }
+
                             default:
                                 break;
                         }
@@ -260,14 +329,11 @@ public class MainActivity extends AppCompatActivity {
                 String string = mEditText.getText().toString();
                 if(string.trim().length()==0) return;
                 List<MDictionary> list= new ArrayList<>();
-                for (MDictionary word : mDictionaryList) {
-                    if(word.keyWord.toUpperCase().contains(mEditText.getText().toString().toUpperCase())){
-                        list.add(word);
-                    }
-                }
+
                 if(list.size()==0){
                     Utils.SenderYandex(string,list,MainActivity.this);
                 }
+
                 DialogSearshWord selectText=new DialogSearshWord();
                 selectText.setDictionary(list);
                 selectText.show(getSupportFragmentManager(),"skdsjf");
@@ -298,7 +364,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mIndexComOut=0;
-                activateText(null,false,false);
+                activateText(null,false,false,null);
                 listActivate(mDictionaryList);
             }
         });
@@ -312,13 +378,7 @@ public class MainActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
                 if(charSequence.length()>0){
-                    List<MDictionary> listTemp=new ArrayList<>();
-                    for (MDictionary word : mDictionaryList) {
-                        if(word.keyWord.toUpperCase().contains(charSequence.toString().toUpperCase())){
-                            listTemp.add(word);
-                        }
-                    }
-
+                    List<MDictionary> listTemp=getWordFromDictionary(charSequence.toString(),false);
                     if(!mIsText){
                         listActivate(listTemp);
                     }
@@ -335,10 +395,6 @@ public class MainActivity extends AppCompatActivity {
 
         mListView.setOnCreateContextMenuListener(this);
 
-
-       // listActivate(mDictionaryList);
-
-
         setListenerToRootView(new IKeyboardVisibilityListener() {
             @Override
             public void onVisibilityChanged(boolean visible) {
@@ -354,28 +410,18 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 mIndexComOut=0;
                 File file=new File(Application.sPath2);
-                if(!file.exists()) return;
-                final File[] files=file.listFiles();
-
-
-
-                List<File> files1=new ArrayList<File>(Arrays.asList(files));
-                Collections.sort(files1, new Comparator<File>() {
-                    @Override
-                    public int compare(File file, File t1) {
-                        return file.getPath().compareTo(t1.getPath());
-                    }
-                });
-                File[] files2=files1.toArray(new File[files1.size()]);
-
-
-                DialogSelectText dialog=new DialogSelectText();
+                File[] files2=Utils.getArrayFiles(file);
+                if(files2==null) return;
+                final DialogSelectText dialog=new DialogSelectText();
                 dialog.setData(new DialogSelectText.ISelectText() {
                     @Override
                     public void activate(File file) {
-                       String ex= file.getPath().substring(file.getPath().lastIndexOf('.')+1);
-                        boolean s=ex.trim().toUpperCase().endsWith("HTML");
-                        activateText(Utils.readFile(file.getPath()),true,s);
+                        if(!file.isDirectory()){
+                            String ex= file.getPath().substring(file.getPath().lastIndexOf('.')+1);
+                            boolean s=ex.trim().toUpperCase().endsWith("HTML");
+                            activateText(Utils.readFile(file.getPath()),true,s,file.getName());
+                            dialog.dismiss();
+                        }
                     }
                 },files2);
                 dialog.show(getSupportFragmentManager(),"dsdd");
@@ -389,7 +435,6 @@ public class MainActivity extends AppCompatActivity {
                 Utils.messageBox(getString(R.string.warning), getString(R.string.error1), MainActivity.this, new IAction() {
                     @Override
                     public void action(Object o) {
-
                         mIndexComOut=0;
                         for (MDictionary mDictionary : mDictionaryList) {
                            if(mDictionary.isSelect()){
@@ -400,7 +445,7 @@ public class MainActivity extends AppCompatActivity {
 
                         Toast.makeText(MainActivity.this, R.string.all_removed, Toast.LENGTH_SHORT).show();
                        if(!mIsText){
-                           activateText(null,false,false);
+                           activateText(null,false,false,null);
                            listActivate(mDictionaryList);
                        }
                     }
@@ -409,45 +454,124 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void translateCore(String selectedText) {
-        if(selectedText.trim().length()>0){
+    private void translateYandex(String selectedText) {
+        List<MDictionary> dictionaryArrayList=getWordFromYandex(selectedText);
+        DialogSearshWord selectText=new DialogSearshWord();
+        selectText.setDictionary(dictionaryArrayList);
+        selectText.show(getSupportFragmentManager(),"skdsjf");
+    }
 
-            MDictionary one=null;
-            List<MDictionary> dictionaryArrayList= new ArrayList<>();
-            for (MDictionary mDictionary : mDictionaryList) {
-                if(mDictionary.keyWord.toUpperCase().contains(selectedText.toUpperCase())){
-                    dictionaryArrayList.add(mDictionary);
-                    if(mDictionary.keyWord.trim().toUpperCase().equals(selectedText.trim().toUpperCase())){
-                        one=mDictionary;
+
+    List<MDictionary> getWordFromDictionary(String selectedText, boolean isSenderYandex) {
+        List<MDictionary> dictionaryArrayList = new ArrayList<>();
+        if (selectedText.trim().length() > 0) {
+
+            if (!Settings.core().synchTraslate) {
+                String res = selectedText.trim().toUpperCase();
+                String res2 = null;
+
+
+                for (MDictionary mDictionary : mDictionaryList) {
+                    if (mDictionary.keyWord.trim().toUpperCase().contains(res)) {
+                        dictionaryArrayList.add(mDictionary);
+                    }
+                }
+
+                if (dictionaryArrayList.size() == 0 && selectedText.length() > 3) {
+                    res = selectedText.trim().toUpperCase().substring(0, selectedText.trim().toUpperCase().length() - 1);
+                    for (MDictionary mDictionary : mDictionaryList) {
+                        if (mDictionary.keyWord.toUpperCase().contains(res)) {
+                            dictionaryArrayList.add(mDictionary);
+                        }
+                    }
+                }
+
+                if (dictionaryArrayList.size() > 0) {
+
+                } else {
+                    if(isSenderYandex){
+                        Utils.SenderYandex(selectedText, dictionaryArrayList, MainActivity.this);
+                    }
+
+
+                }
+
+                MDictionary one = null;
+                if (dictionaryArrayList.size() > 1) {
+                    for (MDictionary dictionary : dictionaryArrayList) {
+                        if (res2 == null) {
+                            if (dictionary.keyWord.trim().toUpperCase().equals(res)) {
+                                one = dictionary;
+                                break;
+                            }
+                        } else {
+                            if (dictionary.keyWord.trim().toUpperCase().equals(res2)) {
+                                one = dictionary;
+                                break;
+                            }
+                        }
+                    }
+                    if (one != null) {
+                        dictionaryArrayList.remove(one);
+                        dictionaryArrayList.add(0, one);
+                    }
+
+                }
+            } else {
+                for (MDictionary mDictionary : mDictionaryList) {
+                    if (mDictionary.valueWord.trim().toUpperCase().contains(selectedText.trim().toUpperCase())) {
+                        dictionaryArrayList.add(mDictionary);
                     }
                 }
             }
-            if(one!=null&&dictionaryArrayList.size()>1){
-                dictionaryArrayList.remove(one);
-                dictionaryArrayList.add(0,one);
-            }
-            if(dictionaryArrayList.size()>0){
 
-            }else{
-               Utils.SenderYandex(selectedText, dictionaryArrayList,MainActivity.this);
 
-            }
+        }
+        return dictionaryArrayList;
+    }
+
+
+    List<MDictionary> getWordFromYandex(String selectedText) {
+        List<MDictionary> dictionaryArrayList = new ArrayList<>();
+
+        Utils.SenderYandex(selectedText, dictionaryArrayList, MainActivity.this);
+
+        return dictionaryArrayList;
+    }
+
+
+
+    private void translateCore(String selectedText) {
+
+
+            List<MDictionary> dictionaryArrayList=getWordFromDictionary(selectedText, true);
             DialogSearshWord selectText=new DialogSearshWord();
             selectText.setDictionary(dictionaryArrayList);
             selectText.show(getSupportFragmentManager(),"skdsjf");
 
-        }
+
     }
 
 
-    void activateText(String text,boolean isShow,boolean isHTML){
+    void activateText(String text,boolean isShow,boolean isHTML,String pathFile){
         mIsText =isShow;
         if(isShow){
+            if(pathFile!=null){
+                this.setTitle(pathFile);
+            }
+
             if(isHTML){
                 mTextCore.setText(Html.fromHtml(text));
                 mTextCore.setTextSize(15);
             }else {
-                mTextCore.setText(text);
+                if(Settings.core().paintWords){
+                    mTextCore.setTag(null);
+                    mTextCore.setText(text, TextView.BufferType.SPANNABLE);
+                    new WordColor(mTextCore).paint();
+                }else {
+                    mTextCore.setTag(null);
+                    mTextCore.setText(text);
+                }
                 mTextCore.setTextSize(20);
             }
 
@@ -455,6 +579,7 @@ public class MainActivity extends AppCompatActivity {
             mListView.setVisibility(View.GONE);
             mPanelAbc.setVisibility(View.GONE);
         }else {
+            this.setTitle(R.string.app_name);
             mPanelText.setVisibility(View.GONE);
             mListView.setVisibility(View.VISIBLE);
             mPanelAbc.setVisibility(View.VISIBLE);
@@ -496,7 +621,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    int[] scrolState=new int[2];
+
     public  void listRefrash() {
+
+        if(mIsText&&Settings.core().paintWords){
+            new WordColor(mTextCore).paint();
+            return;
+        }
+
         if(mAdapter !=null){
             mAdapter.notifyDataSetInvalidated();
         }
@@ -601,18 +734,7 @@ public class MainActivity extends AppCompatActivity {
             menu.add(R.string.addWord).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
-                    DialogAddWord editWord=new DialogAddWord();
-                    editWord.setIAction(new IAction() {
-                        @Override
-                        public void action(Object o) {
-                            Configure.getSession().insert(o);
-                            mDictionaryList.add((MDictionary) o);
-                            mAdapter.add((MDictionary) o);
-                            mAdapter.notifyDataSetInvalidated();
-                            Toast.makeText(MainActivity.this, R.string.addnew, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    editWord.show(getSupportFragmentManager(),"ada");
+                    addNewWord();
                     return false;
                 }
             });
@@ -639,6 +761,22 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+    }
+
+
+    private void addNewWord() {
+        DialogAddWord editWord=new DialogAddWord();
+        editWord.setIAction(new IAction() {
+            @Override
+            public void action(Object o) {
+                Configure.getSession().insert(o);
+                mDictionaryList.add((MDictionary) o);
+                mAdapter.add((MDictionary) o);
+                mAdapter.notifyDataSetInvalidated();
+                Toast.makeText(MainActivity.this, R.string.addnew, Toast.LENGTH_SHORT).show();
+            }
+        });
+        editWord.show(getSupportFragmentManager(),"ada");
     }
 
 
@@ -680,6 +818,8 @@ public class MainActivity extends AppCompatActivity {
             return sd;
         }
     }
+
+
 }
 
 
