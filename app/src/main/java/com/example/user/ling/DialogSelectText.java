@@ -18,7 +18,6 @@ import java.util.Arrays;
 
 public class DialogSelectText extends DialogFragment {
 
-
     private ISelectText mISelectText;
     private File[] mFiles;
     private String[] mStrings;
@@ -31,11 +30,7 @@ public class DialogSelectText extends DialogFragment {
             String ss = files[i].getPath().substring(files[i].getPath().lastIndexOf(File.separator) + 1);
             mStrings[i]=ss;
         }
-
     }
-
-
-
 
     @NonNull
     @Override
@@ -72,7 +67,6 @@ public class DialogSelectText extends DialogFragment {
             listView.setAdapter(adapter);
         }
     }
-
 
     public interface ISelectText{
         void activate(File file);

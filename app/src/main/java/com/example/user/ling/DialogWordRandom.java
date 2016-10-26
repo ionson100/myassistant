@@ -9,9 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.user.ling.orm2.Configure;
-import com.example.user.ling.orm2.Table;
 
 public class DialogWordRandom extends DialogFragment {
 

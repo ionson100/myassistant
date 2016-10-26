@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My fight</string>
+    <string name="app_name">Figli-Migli</string>
     <string name="add">Добавить в избранное</string>
     <string name="remove">Удалить из избранных</string>
     <string name="warning">Предупреждение</string>
@@ -39,5 +39,6 @@
     <string name="addin">Added</string>
     <string name="color_select_word">Цвет выделенных слов</string>
     <string name="yandex">Яндекс</string>
+    <string name="remove_from_story">Удалить из истории</string>
 </resources>
 

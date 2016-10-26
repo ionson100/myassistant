@@ -7,19 +7,11 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 import com.settings.ion.mylibrary.Settingion;
 
-/**
- * Created by USER on 18.10.2016.
- */
 
 public class DialogSettings extends DialogFragment {
-
-
 
     @NonNull
     @Override

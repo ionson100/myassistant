@@ -1,6 +1,7 @@
 package com.example.user.ling;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +23,9 @@ class MyArrayAdapterWord extends ArrayAdapter<MDictionary> {
         super(context, resource, objects);
         this.mResource = resource;
     }
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         final MDictionary p = getItem(position);
         View mView =  LayoutInflater.from(getContext()).inflate(mResource, null);
         TextView text_word= (TextView) mView.findViewById(R.id.text_word);

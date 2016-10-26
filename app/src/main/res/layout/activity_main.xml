@@ -105,8 +105,8 @@
                     android:id="@+id/image_delete_select_word"
                     android:background="@null"
                     android:src="@drawable/selct_delet"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="@dimen/image_button"
+                    android:layout_height="@dimen/image_button"
                     android:contentDescription="ass" />
 
             </LinearLayout>
@@ -121,8 +121,8 @@
                     android:id="@+id/image_translate"
                     android:background="@null"
                     android:src="@drawable/select_translate"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="@dimen/image_button"
+                    android:layout_height="@dimen/image_button"
                     android:contentDescription="ass5" />
             </LinearLayout>
             <LinearLayout
@@ -137,8 +137,8 @@
                     android:id="@+id/image_text_list"
                     android:background="@null"
                     android:src="@drawable/select_list_file"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp" />
+                    android:layout_width="@dimen/image_button"
+                    android:layout_height="@dimen/image_button" />
             </LinearLayout>
 
             <LinearLayout
@@ -153,8 +153,8 @@
                     android:id="@+id/image_edit"
                     android:background="@null"
                     android:src="@drawable/select_edit"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp" />
+                    android:layout_width="@dimen/image_button"
+                    android:layout_height="@dimen/image_button" />
             </LinearLayout>
             <LinearLayout
 
@@ -166,8 +166,8 @@
                     android:id="@+id/bt_random"
                     android:background="@null"
                     android:src="@drawable/select_random"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="@dimen/image_button"
+                    android:layout_height="@dimen/image_button"
                     android:contentDescription="ass4" />
             </LinearLayout>
 
@@ -180,8 +180,8 @@
                     android:id="@+id/bt_show_all"
                     android:background="@null"
                     android:src="@drawable/select_action_name"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="@dimen/image_button"
+                    android:layout_height="@dimen/image_button"
                     android:contentDescription="ass2" />
             </LinearLayout>
         </LinearLayout>
@@ -200,7 +200,7 @@
             <LinearLayout
                 android:paddingLeft="20sp"
                 android:paddingRight="20sp"
-                android:layout_weight="0.9"
+                android:layout_weight="0.8"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
                 <EditText
@@ -222,12 +222,29 @@
                 <ImageButton
                     android:id="@+id/button_text_search"
                     android:background="@null"
-                    android:src="@drawable/ic_search"
+                    android:src="@drawable/yandex"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:contentDescription="ass3" />
 
             </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:id="@+id/searsh_text_2"
+                android:layout_weight="0.1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ImageButton
+                    android:id="@+id/button_text_search_2"
+                    android:background="@null"
+                    android:src="@drawable/accessories_dictionary"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:contentDescription="ass3" />
+
+            </LinearLayout>
+
 
 
         </LinearLayout>

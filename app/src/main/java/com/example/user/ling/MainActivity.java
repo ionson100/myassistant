@@ -33,8 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static android.R.attr.max;
-import static android.R.attr.mode;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -82,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
                List<MDictionary> list=Configure.getSession().getList(MDictionary.class," index_story > 0 order by index_story ");
                 DialogSearshWord selectText=new DialogSearshWord();
                 selectText.setDictionary(list);
+                selectText.isHistory();
                 selectText.show(getSupportFragmentManager(),"skdsjf");
                 return false;
             }
@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                 menu.add(0, YANDEX, 0, R.string.yandex).setIcon(R.drawable.yandex);
-                menu.add(0, DEFINITION, 0, R.string.kahskjas).setIcon(R.drawable.ic_translator);
+                menu.add(0, DEFINITION, 0, R.string.kahskjas).setIcon(R.drawable.accessories_dictionary);
                 return true;
             }
 
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onCreateActionMode(android.view.ActionMode actionMode, Menu menu) {
                         menu.add(0, YANDEX, 0, R.string.yandex).setIcon(R.drawable.yandex);
-                        menu.add(0, DEFINITION, 0, R.string.kahskjas).setIcon(R.drawable.ic_translator);
+                        menu.add(0, DEFINITION, 0, R.string.kahskjas).setIcon(R.drawable.accessories_dictionary);
                         mActionMode=actionMode;
                         return true;
                     }
@@ -229,12 +229,8 @@ public class MainActivity extends AppCompatActivity {
                                     min = Math.max(0, Math.min(selStart, selEnd));
                                     max = Math.max(0, Math.max(selStart, selEnd));
                                 }
-                                // Perform your definition lookup with the selected text
                                 final String selectedText = mTextCore.getText().subSequence(min, max).toString();
                                 translateCore(selectedText);
-
-
-                                // Finish and close the ActionMode
                                 actionMode.finish();
                                 return true;
                             }
@@ -290,7 +286,6 @@ public class MainActivity extends AppCompatActivity {
                 mIndexComOut=0;
                 DialogSearshWord selectText=new DialogSearshWord();
                 selectText.setDictionary(Utils.getSelectWordses());
-               // selectText.notShowMenu();
                 selectText.show(getSupportFragmentManager(),"skdsjf");
 
             }
@@ -311,12 +306,10 @@ public class MainActivity extends AppCompatActivity {
                                 mEditText.requestFocus();
                                 mEditText.setText("");
                                 if(mIsText){
-
                                     mSsearshText.setVisibility(View.VISIBLE);
                                 }else{
                                     mSsearshText.setVisibility(View.VISIBLE);
                                 }
-
                             }
                         });
             }
@@ -340,14 +333,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //mDictionaryList=Configure.getSession().getList(MDictionary.class," 1=1 ORDER BY keyWord ASC  ");
+
+
+        findViewById(R.id.button_text_search_2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String string = mEditText.getText().toString();
+                if(string.trim().length()==0) return;
+                List<MDictionary> list= getWordFromDictionary(string,true);
+                DialogSearshWord selectText=new DialogSearshWord();
+                selectText.setDictionary(list);
+                selectText.show(getSupportFragmentManager(),"skdsjf");
+            }
+        });
+
         new PreviewTask().execute();
-
-
-
-
-
-
 
         findViewById(R.id.bt_random).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -532,6 +532,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     List<MDictionary> getWordFromYandex(String selectedText) {
+
         List<MDictionary> dictionaryArrayList = new ArrayList<>();
 
         Utils.SenderYandex(selectedText, dictionaryArrayList, MainActivity.this);
@@ -543,13 +544,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void translateCore(String selectedText) {
 
-
             List<MDictionary> dictionaryArrayList=getWordFromDictionary(selectedText, true);
             DialogSearshWord selectText=new DialogSearshWord();
             selectText.setDictionary(dictionaryArrayList);
             selectText.show(getSupportFragmentManager(),"skdsjf");
-
-
     }
 
 
@@ -664,9 +662,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
-
-
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -779,7 +774,6 @@ public class MainActivity extends AppCompatActivity {
         editWord.show(getSupportFragmentManager(),"ada");
     }
 
-
     @Override
     public void onBackPressed() {
         if(++mIndexComOut <2){
@@ -790,7 +784,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
-
 
 
     class PreviewTask extends AsyncTask<Void, Void, List<MDictionary>> {
