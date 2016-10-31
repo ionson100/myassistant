@@ -1,11 +1,15 @@
 package com.example.user.ling;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.Html;
@@ -21,10 +25,11 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
+
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.user.ling.orm2.Configure;
@@ -32,7 +37,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
 
 
 public class MainActivity extends AppCompatActivity {
@@ -86,6 +90,33 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        menu.add(R.string.clear_selectword).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+
+                Utils.messageBox(getString(R.string.warning), getString(R.string.error1), MainActivity.this, new IAction() {
+                    @Override
+                    public void action(Object o) {
+                        mIndexComOut=0;
+                        for (MDictionary mDictionary : mDictionaryList) {
+                            if(mDictionary.isSelect()){
+                                mDictionary.setSelect(false);
+                                Configure.getSession().update(mDictionary);
+                            }
+                        }
+
+                        Toast.makeText(MainActivity.this, R.string.all_removed, Toast.LENGTH_SHORT).show();
+                        if(!mIsText){
+                            activateText(null,false,false,null);
+                            listActivate(mDictionaryList);
+                        }
+                    }
+                });
+                return false;
+            }
+        });
+
 
         menu.add(R.string.help_name).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -283,11 +314,23 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                getMyDictionary();
+
+
+                Settings.Add(new WrapperAction(Wrapperator.SHOW_MY_DICTIONARY,new IAction() {
+                    @Override
+                    public void action(Object o) {
+                        getMyDictionary();
+                    }
+                }));
+
+            }
+
+            private void getMyDictionary() {
                 mIndexComOut=0;
                 DialogSearshWord selectText=new DialogSearshWord();
                 selectText.setDictionary(Utils.getSelectWordses());
                 selectText.show(getSupportFragmentManager(),"skdsjf");
-
             }
         });
 
@@ -345,6 +388,8 @@ public class MainActivity extends AppCompatActivity {
                 selectText.setDictionary(list);
                 selectText.show(getSupportFragmentManager(),"skdsjf");
             }
+
+
         });
 
         new PreviewTask().execute();
@@ -363,9 +408,13 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.bt_show_all).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mIndexComOut=0;
-                activateText(null,false,false,null);
-                listActivate(mDictionaryList);
+                getCommonDictionary();
+                Settings.Add(new WrapperAction(Wrapperator.SHOW_COMMON_DICTIONARY, new IAction() {
+                    @Override
+                    public void action(Object o) {
+                        getCommonDictionary();
+                    }
+                }));
             }
         });
 
@@ -408,23 +457,49 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.image_text_list).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (getMyList()) return;
+
+                Settings.core().Add(new WrapperAction(Wrapperator.SHOW_MY_LIST,new IAction() {
+                    @Override
+                    public void action(Object o) {
+                        if (getMyList()) return;
+                    }
+                }));
+            }
+
+            private boolean getMyList() {
                 mIndexComOut=0;
                 File file=new File(Application.sPath2);
-                File[] files2=Utils.getArrayFiles(file);
-                if(files2==null) return;
-                final DialogSelectText dialog=new DialogSelectText();
-                dialog.setData(new DialogSelectText.ISelectText() {
+                File[] files2= Utils.getArrayFiles(file);
+                if(files2==null) return true;
+                final DialogFileNames dialog=new DialogFileNames();
+                dialog.setData(new DialogFileNames.ISelectText() {
                     @Override
-                    public void activate(File file) {
+                    public void activate(final File file) {
                         if(!file.isDirectory()){
+
                             String ex= file.getPath().substring(file.getPath().lastIndexOf('.')+1);
                             boolean s=ex.trim().toUpperCase().endsWith("HTML");
                             activateText(Utils.readFile(file.getPath()),true,s,file.getName());
-                            dialog.dismiss();
+                            if(dialog!=null){
+                                dialog.dismiss();
+                            }
+                            Settings.Add(new WrapperAction(ex.hashCode(),new IAction() {
+                                @Override
+                                public void action(Object o) {
+                                    String ex= file.getPath().substring(file.getPath().lastIndexOf('.')+1);
+                                    boolean s=ex.trim().toUpperCase().endsWith("HTML");
+                                    activateText(Utils.readFile(file.getPath()),true,s,file.getName());
+                                    if(dialog!=null){
+                                        dialog.dismiss();
+                                    }
+                                }
+                            }));
                         }
                     }
                 },files2);
                 dialog.show(getSupportFragmentManager(),"dsdd");
+                return false;
             }
         });
 
@@ -452,7 +527,18 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+
+        new SpeechSearch(MainActivity.this).activate();
+
+
     }
+
+    private void getCommonDictionary() {
+        mIndexComOut=0;
+        activateText(null,false,false,null);
+        listActivate(mDictionaryList);
+    }
+
 
     private void translateYandex(String selectedText) {
         List<MDictionary> dictionaryArrayList=getWordFromYandex(selectedText);
@@ -776,13 +862,60 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(++mIndexComOut <2){
-            Toast.makeText(this, R.string.eqek, Toast.LENGTH_SHORT).show();
+        if(Settings.core().iActions.size()==0){
+            if(++mIndexComOut <2){
+                Toast.makeText(this, R.string.eqek, Toast.LENGTH_SHORT).show();
+            }else {
+                mIndexComOut =0;
+                finish();
+
+            }
         }else {
-            mIndexComOut =0;
-            finish();
+            if(Settings.iActions.size()==1){
+                Settings.iActions.clear();
+                getCommonDictionary();
+            }else {
+                Settings.core().iActions.get(Settings.core().iActions.size()-2).iAction.action(null);
+                Settings.core().iActions.remove(Settings.core().iActions.size()-1);
+            }
 
         }
+
+    }
+
+
+
+
+        @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SpeechSearch.SPEECH&& resultCode == RESULT_OK) {
+            final ArrayList matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (matches.size() == 0){
+                Toast.makeText(MainActivity.this, "Гугл не распознал ", Toast.LENGTH_LONG).show();
+            }
+            else{
+                Toast.makeText(this, matches.get(0).toString(), Toast.LENGTH_SHORT).show();
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        showResultSpeech(matches.get(0).toString());
+                    }
+                });
+            }
+        }
+    }
+
+    void showResultSpeech(String word){
+        try{
+            List<MDictionary> ww=Searcher.getDictionarys(mDictionaryList,word,this);
+            DialogSearshWord  dialog =new DialogSearshWord();
+            dialog.setDictionary(ww);
+            dialog.show(getSupportFragmentManager(),"rer");
+        }catch (Exception dd){
+            Toast.makeText(this, dd.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
     }
 
 
@@ -803,6 +936,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             MainActivity.this.findViewById(R.id.panel_buton_top).setVisibility(View.VISIBLE);
+            if(Settings.iActions.size()>0){
+                Settings.iActions.get(Settings.iActions.size()).iAction.action(null);
+            }
         }
 
         @Override
@@ -813,6 +949,59 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+}
+class SpeechSearch{
+
+    public static final int SPEECH=23;
+
+
+    private ImageButton imageButton;
+    private final MainActivity activity;
+
+    public SpeechSearch( MainActivity activity){
+        this.imageButton = (ImageButton) activity.findViewById(R.id.image_microphone);
+        this.activity = activity;
+    }
+    public void activate(){
+
+        if(!isSpeechRecognitionActivityPresented(activity)){
+            activity.findViewById(R.id.parent_microphon).setVisibility(View.GONE);
+            return;
+        }
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // создаем Intent с действием RecognizerIntent.ACTION_RECOGNIZE_SPEECH
+                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+
+                // добавляем дополнительные параметры:
+
+                if(Settings.core().directTraslateSpeec){
+
+                }else{
+                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
+                }
+
+                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Голосовой поиск");
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
+
+                // стартуем Activity и ждем от нее результата
+                activity.startActivityForResult(intent, SPEECH);
+            }
+        });
+    }
+    private static boolean isSpeechRecognitionActivityPresented(Activity ownerActivity) {
+        try {
+            PackageManager pm = ownerActivity.getPackageManager();
+            List activities = pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
+            if (activities.size() != 0) {
+                return true;
+            }
+        } catch (Exception e) {}
+
+        return false;
+    }
 }
 
 

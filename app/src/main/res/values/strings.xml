@@ -40,5 +40,8 @@
     <string name="color_select_word">Цвет выделенных слов</string>
     <string name="yandex">Яндекс</string>
     <string name="remove_from_story">Удалить из истории</string>
+    <string name="direct_translate_speech">Eng_Rus ---- Rus_Eng</string>
+    <string name="direct_translate_speech_titl">Голосовои перевод</string>
+    <string name="clear_selectword">Очистить мой словарь</string>
 </resources>
 

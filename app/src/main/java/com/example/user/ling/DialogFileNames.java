@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 
-public class DialogSelectText extends DialogFragment {
+public class DialogFileNames extends DialogFragment {
 
     private ISelectText mISelectText;
     private File[] mFiles;

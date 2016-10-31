@@ -95,6 +95,24 @@
             android:baselineAligned="false">
 
             <LinearLayout
+                android:id="@+id/parent_microphon"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="horizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <ImageButton
+                    android:id="@+id/image_microphone"
+                    android:background="@null"
+                    android:src="@drawable/ic_microphone"
+                    android:layout_width="@dimen/image_button"
+                    android:layout_height="@dimen/image_button"
+                    android:contentDescription="ass" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:visibility="gone"
                 android:gravity="center_vertical|center_horizontal"
                 android:orientation="horizontal"
                 android:layout_width="0dp"
