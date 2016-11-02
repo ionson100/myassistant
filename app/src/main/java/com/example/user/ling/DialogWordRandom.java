@@ -26,7 +26,9 @@ public class DialogWordRandom extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_word, null);
 
-        ((TextView) v.findViewById(R.id.word_e)).setText(mDictionary.valueWord);
+        TextView mTextCore= (TextView) v.findViewById(R.id.word_e);
+        mTextCore.setText(mDictionary.valueWord, TextView.BufferType.SPANNABLE);
+        new WordSpaner(mTextCore,mDictionary.keyWord).bold(getActivity());
 
         v.findViewById(R.id.add_select).setOnClickListener(new View.OnClickListener() {
             @Override

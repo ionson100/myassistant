@@ -49,7 +49,6 @@ public class DialogEditWord extends DialogFragment {
                 save();
             }
         });
-
         builder.setView(v);
         return builder.create();
     }
@@ -60,11 +59,7 @@ public class DialogEditWord extends DialogFragment {
             Toast.makeText(getContext(), "Поле не заполнено", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        ISession session = Configure.getSession();
         mWord.valueWord= mEditText.getText().toString().trim();
-
-
         Toast.makeText(getContext(), "Edited", Toast.LENGTH_SHORT).show();
         mIAction.action(mWord);
         dismiss();

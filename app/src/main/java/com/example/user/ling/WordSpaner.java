@@ -1,7 +1,9 @@
 package com.example.user.ling;
 
+import android.app.Activity;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.TextAppearanceSpan;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,14 +14,14 @@ import java.util.regex.Pattern;
  * раскрасчик текста
  */
 
-class WordColor {
+class WordSpaner {
 
     private final String baseText;
     private TextView textView;
 
     private final String[] words;
 
-    WordColor(TextView textView){
+    WordSpaner(TextView textView){
 
         this.baseText = textView.getText().toString().toUpperCase();
         this.textView = textView;
@@ -28,6 +30,16 @@ class WordColor {
             words[i]=Utils.getSelectWordses().get(i).keyWord.trim().toUpperCase();
         }
     }
+
+    WordSpaner(TextView textView, String baseText){
+
+        this.baseText = textView.getText().toString().toUpperCase();
+        this.textView = textView;
+        words=new String[1];
+        words[0]=baseText.toUpperCase();
+    }
+
+
 
     void paint(){
 
@@ -50,30 +62,27 @@ class WordColor {
                 //s.setSpan(new ForegroundColorSpan(Settings.core().colorSelectWords), matcher.start(), matcher.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
-
-
-
-
     }
-}
-class Spaner{
-    private  Spannable spannable;
-
-   Spaner(Spannable spannable){
-       this.spannable = spannable;
-   }
-
-    private List<Object> objectList=new ArrayList<>();
-
-    public void add(Object o,int star,int end){
-        objectList.add(o);
-        spannable.setSpan(o,star,end,Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-    }
-    void clear(){
-        for (Object o : objectList) {
-            spannable.removeSpan(o);
+    void bold(Activity activity){
+        if(textView.getTag()==null){
+            textView.setTag(new Spaner((Spannable)textView.getText()));
         }
-        objectList=new ArrayList<>();
-    }
+        Spaner spaner = (Spaner) textView.getTag();
+        spaner.clear();
 
+
+        for (String word : words) {
+
+            if(word==null) continue;
+            Pattern pattern = Pattern.compile(word);
+            Matcher matcher = pattern.matcher(baseText);
+
+
+            while (matcher.find()) {
+                matcher.start();
+                spaner.add(new TextAppearanceSpan(activity, R.style.myStyleBold), matcher.start(), matcher.end());
+                //s.setSpan(new ForegroundColorSpan(Settings.core().colorSelectWords), matcher.start(), matcher.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        }
+    }
 }

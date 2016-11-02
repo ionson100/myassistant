@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -286,8 +287,26 @@ public class Utils {
         }
     }
 
+    public static String read(File file) {
+        StringBuilder stringBuffer = new StringBuilder();
+        FileReader fileReader = null;
+        try {
+            fileReader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuffer.append(line);
+            }
+            fileReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+        return stringBuffer.toString();
+    }
+
 }
 
-interface IAction{
-    void action(Object o);
-}

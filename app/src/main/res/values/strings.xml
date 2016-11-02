@@ -43,5 +43,7 @@
     <string name="direct_translate_speech">Eng_Rus ---- Rus_Eng</string>
     <string name="direct_translate_speech_titl">Голосовои перевод</string>
     <string name="clear_selectword">Очистить мой словарь</string>
+    <string name="analysis">Анализ текстов перевода</string>
+    <string name="add_word">Добавить слово</string>
 </resources>
 

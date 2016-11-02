@@ -21,6 +21,13 @@ import java.util.List;
 
 public class DialogSearshWord extends DialogFragment {
 
+    private IAction iAction ;
+
+    public void setiAction(IAction iAction){
+        this.iAction=iAction;
+    }
+
+
     private List<MDictionary> mDictionaryList;
 
     private boolean isShowHistory=false;
@@ -45,7 +52,7 @@ public class DialogSearshWord extends DialogFragment {
         View v = vi.inflate(R.layout.dialog_select_text, null);
 
         final ListView mListView = (ListView) v.findViewById(R.id.list_view_text);
-        mAdapter = new MyArrayAdapterWord(getContext(), R.layout.simple_list_item_1, mDictionaryList);
+        mAdapter = new MyArrayAdapterWord(getContext(), R.layout.simple_list_item_1, mDictionaryList,getActivity());
         mListView.setAdapter(mAdapter);
 
         mListView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
@@ -54,6 +61,18 @@ public class DialogSearshWord extends DialogFragment {
                 AdapterView.AdapterContextMenuInfo aMenuInfo = (AdapterView.AdapterContextMenuInfo) contextMenuInfo;
                 final int position = aMenuInfo.position;
                 final MDictionary mDictionary=mDictionaryList.get(position);
+
+                if(iAction!=null){
+
+                    contextMenu.add(R.string.add_word).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            iAction.action(mDictionary.valueWord);
+                            return false;
+                        }
+                    });
+                    return;
+                }
 
                 if(isShowHistory){
                     contextMenu.add(R.string.remove_from_story).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {

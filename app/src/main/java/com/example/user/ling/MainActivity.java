@@ -1,8 +1,6 @@
 package com.example.user.ling;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -25,7 +23,6 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -130,6 +127,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 addNewWord();
+                return false;
+            }
+        });
+
+        menu.add(R.string.analysis).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                new AnalysisTexts(MainActivity.this,mListView,mDictionaryList).run();
                 return false;
             }
         });
@@ -651,7 +656,7 @@ public class MainActivity extends AppCompatActivity {
                 if(Settings.core().paintWords){
                     mTextCore.setTag(null);
                     mTextCore.setText(text, TextView.BufferType.SPANNABLE);
-                    new WordColor(mTextCore).paint();
+                    new WordSpaner(mTextCore).paint();
                 }else {
                     mTextCore.setTag(null);
                     mTextCore.setText(text);
@@ -672,7 +677,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     void listActivate(List<MDictionary> words){
-        mAdapter = new MyArrayAdapterWord(this, R.layout.simple_list_item_1, new ArrayList<>(words));
+        mAdapter = new MyArrayAdapterWord(this, R.layout.simple_list_item_1, new ArrayList<>(words),MainActivity.this);
         mListView.setAdapter(mAdapter);
     }
 
@@ -710,7 +715,7 @@ public class MainActivity extends AppCompatActivity {
     public  void listRefrash() {
 
         if(mIsText&&Settings.core().paintWords){
-            new WordColor(mTextCore).paint();
+            new WordSpaner(mTextCore).paint();
             return;
         }
 
@@ -730,7 +735,7 @@ public class MainActivity extends AppCompatActivity {
             mD.add(d);
         }
 
-        listViewE.setAdapter(new MyArrayAdapterWord(this, R.layout.simple_list_item_2, new ArrayList<>(mD)));
+        listViewE.setAdapter(new MyArrayAdapterWord(this, R.layout.simple_list_item_2, new ArrayList<>(mD),MainActivity.this));
         listViewE.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -803,6 +808,7 @@ public class MainActivity extends AppCompatActivity {
                     editWord.setIAction(new IAction() {
                         @Override
                         public void action(Object o) {
+                            Configure.getSession().update(o);
                             mAdapter.notifyDataSetChanged();
                         }
                     });
@@ -819,6 +825,8 @@ public class MainActivity extends AppCompatActivity {
                     return false;
                 }
             });
+
+
 
             final Parcelable[] state = new Parcelable[1];
             menu.add(R.string.delete).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -949,59 +957,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-}
-class SpeechSearch{
-
-    public static final int SPEECH=23;
-
-
-    private ImageButton imageButton;
-    private final MainActivity activity;
-
-    public SpeechSearch( MainActivity activity){
-        this.imageButton = (ImageButton) activity.findViewById(R.id.image_microphone);
-        this.activity = activity;
-    }
-    public void activate(){
-
-        if(!isSpeechRecognitionActivityPresented(activity)){
-            activity.findViewById(R.id.parent_microphon).setVisibility(View.GONE);
-            return;
-        }
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // создаем Intent с действием RecognizerIntent.ACTION_RECOGNIZE_SPEECH
-                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-
-                // добавляем дополнительные параметры:
-
-                if(Settings.core().directTraslateSpeec){
-
-                }else{
-                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
-                }
-
-                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Голосовой поиск");
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-                intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
-
-                // стартуем Activity и ждем от нее результата
-                activity.startActivityForResult(intent, SPEECH);
-            }
-        });
-    }
-    private static boolean isSpeechRecognitionActivityPresented(Activity ownerActivity) {
-        try {
-            PackageManager pm = ownerActivity.getPackageManager();
-            List activities = pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
-            if (activities.size() != 0) {
-                return true;
-            }
-        } catch (Exception e) {}
-
-        return false;
-    }
 }
 
 

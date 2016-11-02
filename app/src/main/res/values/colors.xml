@@ -9,4 +9,5 @@
     <color name="panel_buttons">#e4e3e3</color>
     <color name="list_bount">#FFCC00</color>
     <color name="list_dict_bount">#e9e7e7</color>
+    <color name="colorword">#08590b</color>
 </resources>

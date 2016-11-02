@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.9">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:gravity="center_vertical"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.9">
+                <TextView
+                    android:textStyle="bold"
+                    android:padding="10sp"
+                    android:textSize="20dp"
+                    android:textColor="@color/colorword"
+                    android:gravity="center_vertical"
+                    android:text="word"
+                    android:id="@+id/word_x"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:gravity="center_vertical"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.1">
+                <TextView
+                    android:textSize="16dp"
+                    android:textColor="@android:color/black"
+                    android:gravity="center_vertical"
+                    android:text="122"
+                    android:id="@+id/word_count_x"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+        <LinearLayout
+            android:gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <TextView
+                android:padding="10sp"
+                android:textSize="16dp"
+                android:textColor="@android:color/black"
+                android:gravity="center_vertical"
+                android:text="122"
+                android:id="@+id/word_translate_x"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+
+    </LinearLayout>
+    <LinearLayout
+        android:gravity="center_horizontal|center_vertical"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.1">
+        <ImageButton
+            android:background="@null"
+            android:src="@drawable/yandex"
+            android:id="@+id/bt_x"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+    </LinearLayout>
+
+</LinearLayout>
