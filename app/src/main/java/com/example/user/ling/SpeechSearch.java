@@ -43,7 +43,7 @@ class SpeechSearch{
                 }
 
                 intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Голосовой поиск");
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,"ru-RU" );//RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
                 intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
 
                 // стартуем Activity и ждем от нее результата

@@ -30,6 +30,8 @@ public class MDictionary {
     @Column("index_story")
     public long indexStory;
 
+    public transient int anInt;
+
 
     public boolean isSelect() {
         return isSelect;

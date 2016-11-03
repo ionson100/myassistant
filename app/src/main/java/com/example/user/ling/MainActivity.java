@@ -1,5 +1,6 @@
 package com.example.user.ling;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.AsyncTask;
@@ -22,11 +23,13 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.user.ling.orm2.Configure;
@@ -34,6 +37,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static com.example.user.ling.tranlate.YandexTranslatorAPI.activity;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -50,15 +55,17 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout mSsearshText;
     private  boolean mIsText;
     public static List<MDictionary> mDictionaryList=new ArrayList<>();
+    public static List<MDictionary> mDictionaryListAnalise=new ArrayList<>();
     private LinearLayout mPanelText;
     private TextView mTextCore;
     private View mParentView;
-    private MyArrayAdapterWord mAdapter =null;
+    private ArrayAdapter<MDictionary> mAdapter =null;
     private RelativeLayout mRelativeLayout;
     private LinearLayout mPanelButton;
     private ListView mListView;
     private EditText mEditText;
     private LinearLayout mPanelAbc;
+    private ScrollView scrollViewText;
 
 
     private android.view.ActionMode mActionMode;
@@ -134,7 +141,8 @@ public class MainActivity extends AppCompatActivity {
         menu.add(R.string.analysis).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                new AnalysisTexts(MainActivity.this,mListView,mDictionaryList).run();
+
+                AnalysisTexts.run(MainActivity.this,mListView);//,mDictionaryList
                 return false;
             }
         });
@@ -172,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
         mPanelText = (LinearLayout) findViewById(R.id.text_panel);
         mTextCore = (TextView) findViewById(R.id.text_core);
         mPanelAbc = (LinearLayout) findViewById(R.id.panel_abc);
+        scrollViewText= (ScrollView) findViewById(R.id.scrol_text);
 
         mTextCore.setCustomSelectionActionModeCallback(new android.view.ActionMode.Callback() {
 
@@ -318,17 +327,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.image_translate).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 getMyDictionary();
-
-
-                Settings.Add(new WrapperAction(Wrapperator.SHOW_MY_DICTIONARY,new IAction() {
-                    @Override
-                    public void action(Object o) {
-                        getMyDictionary();
-                    }
-                }));
-
             }
 
             private void getMyDictionary() {
@@ -403,10 +402,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mIndexComOut=0;
-                DialogWordRandom dialogWord=new DialogWordRandom();
                 int index=new Random().nextInt(mDictionaryList.size())-1;
-                dialogWord.setDictionary(mDictionaryList.get(index));
-                dialogWord.show(getSupportFragmentManager(),"sdsd");
+                DialogSearshWord selectText=new DialogSearshWord();
+                List<MDictionary> list=new ArrayList<MDictionary>(1);
+                list.add(mDictionaryList.get(index));
+                selectText.setDictionary(list);
+                selectText.show(getSupportFragmentManager(),"skdsjf");
             }
         });
 
@@ -420,6 +421,7 @@ public class MainActivity extends AppCompatActivity {
                         getCommonDictionary();
                     }
                 }));
+                Settings.core().setPath(null);
             }
         });
 
@@ -489,17 +491,7 @@ public class MainActivity extends AppCompatActivity {
                             if(dialog!=null){
                                 dialog.dismiss();
                             }
-                            Settings.Add(new WrapperAction(ex.hashCode(),new IAction() {
-                                @Override
-                                public void action(Object o) {
-                                    String ex= file.getPath().substring(file.getPath().lastIndexOf('.')+1);
-                                    boolean s=ex.trim().toUpperCase().endsWith("HTML");
-                                    activateText(Utils.readFile(file.getPath()),true,s,file.getName());
-                                    if(dialog!=null){
-                                        dialog.dismiss();
-                                    }
-                                }
-                            }));
+                            Settings.core().setPath(file.getPath());
                         }
                     }
                 },files2);
@@ -541,7 +533,17 @@ public class MainActivity extends AppCompatActivity {
     private void getCommonDictionary() {
         mIndexComOut=0;
         activateText(null,false,false,null);
-        listActivate(mDictionaryList);
+
+        if(mListView.getAdapter() instanceof MyArrayAdapterAnalises){
+            ArrayAdapter<MDictionary>  aa=new MyArrayAdapterAnalises(MainActivity.this,R.layout.item_analises,mDictionaryListAnalise,MainActivity.this,mDictionaryList,null);
+            mListView.setAdapter(aa);
+
+        }else {
+            ArrayAdapter<MDictionary>  aa = new MyArrayAdapterWord(MainActivity.this, R.layout.simple_list_item_1, mDictionaryList,MainActivity.this);
+            mListView.setAdapter(aa);
+        }
+        Settings.core().setPath(null);
+       // listActivate(mDictionaryList);
     }
 
 
@@ -710,7 +712,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    int[] scrolState=new int[2];
+
 
     public  void listRefrash() {
 
@@ -734,21 +736,39 @@ public class MainActivity extends AppCompatActivity {
             d.valueWord=s;
             mD.add(d);
         }
-
-        listViewE.setAdapter(new MyArrayAdapterWord(this, R.layout.simple_list_item_2, new ArrayList<>(mD),MainActivity.this));
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                R.layout.simple_list_item_11, Utils.sListABC);
+//        MyArrayAdapterWord df=new MyArrayAdapterWord(this, R.layout.simple_list_item_2, new ArrayList<>(mD),MainActivity.this);
+        listViewE.setAdapter(adapter);
         listViewE.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String string = Utils.sListABC[position];
-                List<MDictionary> dictionaryList=new ArrayList<>();
-                for (MDictionary dictionary : mDictionaryList) {
+                List<MDictionary> dictionaryList=mDictionaryList;
+                if(mListView.getAdapter() instanceof MyArrayAdapterAnalises){
+                    dictionaryList=mDictionaryListAnalise;
+                }
+
+                List<MDictionary> res= new ArrayList<>();
+                for (MDictionary dictionary : dictionaryList) {
                     char d=dictionary.keyWord.trim().toUpperCase().charAt(0);
                     char d2=string.charAt(0);
                     if(d==d2){
-                        dictionaryList.add(dictionary);
+                        res.add(dictionary);
                     }
                 }
-                listActivate(dictionaryList);
+                if(mListView.getAdapter() instanceof MyArrayAdapterAnalises){
+                    ArrayAdapter<MDictionary>  aa=new MyArrayAdapterAnalises(MainActivity.this,R.layout.item_analises,res,activity,mDictionaryList,null);
+                    mListView.setAdapter(aa);
+
+                }else {
+                    ArrayAdapter<MDictionary>  aa = new MyArrayAdapterWord(MainActivity.this, R.layout.simple_list_item_1, res,MainActivity.this);
+                    mListView.setAdapter(aa);
+                }
+                Settings.core().setPath(null);
+                //listActivate(dictionaryList);
             }
         });
     }
@@ -870,6 +890,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+
+
+        if(mListView.getAdapter() instanceof MyArrayAdapterAnalises){
+            ArrayAdapter<MDictionary>  aa = new MyArrayAdapterWord(MainActivity.this, R.layout.simple_list_item_1, mDictionaryList,MainActivity.this);
+            mListView.setAdapter(aa);
+            return;
+        }
+
+        Settings.core().setPath(null);
+        listActivate(mDictionaryList);
+
+
+
         if(Settings.core().iActions.size()==0){
             if(++mIndexComOut <2){
                 Toast.makeText(this, R.string.eqek, Toast.LENGTH_SHORT).show();
@@ -947,6 +980,43 @@ public class MainActivity extends AppCompatActivity {
             if(Settings.iActions.size()>0){
                 Settings.iActions.get(Settings.iActions.size()).iAction.action(null);
             }
+
+            String path=Settings.core().getPath();
+
+            if(path!=null){
+               if(new File(path).exists()==false) return;
+                String ex= path.substring(path.lastIndexOf('.')+1);
+                boolean s=ex.trim().toUpperCase().endsWith("HTML");
+                activateText(Utils.readFile(path),true,s,path.substring(path.lastIndexOf("/")+1));
+
+
+                scrollViewText.post(new Runnable() {
+                    public void run() {
+                        try{
+                            int[] dd=Settings.core().stateText;
+                            if(dd!=null){
+                                scrollViewText.scrollTo(dd[0], dd[1]);
+                            }
+                        }catch(Exception ignore){}
+                    }
+                });
+
+
+
+            }else {
+
+                mListView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        try{
+                            int ff=Settings.core().stateList;
+                            if(ff!=0){
+                                mListView.setSelection(ff);
+                            }
+                        }catch (Exception ignore){}
+                    }
+                });
+            }
         }
 
         @Override
@@ -956,7 +1026,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        int ff=mListView.getFirstVisiblePosition();
+        Settings.core().stateList= ff;
 
+        int[] dd=new int[2];
+        dd[0]= scrollViewText.getScrollX();
+        dd[1]= scrollViewText.getScrollY();
+        Settings.core().stateText=dd;
+
+        Settings.core().save();
+    }
 }
 
 

@@ -17,7 +17,7 @@ import java.util.List;
 import static com.example.user.ling.R.id.red_star;
 
 
-class MyArrayAdapterWord extends ArrayAdapter<MDictionary> {
+class MyArrayAdapterWord extends ArrayAdapter<MDictionary> implements IMDictionaryList{
 
     private final Context context;
     private final int mResource;
@@ -63,5 +63,10 @@ class MyArrayAdapterWord extends ArrayAdapter<MDictionary> {
         }
         mView.setTag(p);
         return mView;
+    }
+
+    @Override
+    public List<MDictionary> getList() {
+        return objects;
     }
 }

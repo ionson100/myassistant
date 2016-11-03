@@ -100,15 +100,17 @@ public class DialogSearshWord extends DialogFragment {
                                     Configure.getSession().insert(mDictionary);
                                     MainActivity.mDictionaryList.add(mDictionary);
                                     Toast.makeText(getContext(), R.string.addin, Toast.LENGTH_SHORT).show();
-                                    mAdapter.notifyDataSetInvalidated();
+                                    mAdapter.notifyDataSetChanged();
                                     ((MainActivity)getActivity()).listRefrash();
                                 }else{
                                     Toast.makeText(getContext(), R.string.error3, Toast.LENGTH_SHORT).show();
                                 }
                             }else {
+
                                 mDictionary.setSelect(true);
                                 Configure.getSession().update(mDictionary);
                                 ((MainActivity)getActivity()).listRefrash();
+                                mAdapter.notifyDataSetChanged();
                                 Toast.makeText(getContext(), R.string.addin, Toast.LENGTH_SHORT).show();
                             }
                             return false;

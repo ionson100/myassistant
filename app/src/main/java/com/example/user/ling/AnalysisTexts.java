@@ -2,6 +2,7 @@ package com.example.user.ling;
 
 import android.app.Activity;
 import android.content.Context;
+import android.media.midi.MidiDeviceInfo;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,55 +22,47 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+import static com.example.user.ling.MainActivity.mDictionaryList;
 
 
 public class AnalysisTexts {
-    private final Activity activity;
-    private final ListView mListView;
-    private List<MDictionary> mDictionaryList;
 
-    public AnalysisTexts(MainActivity activity, ListView mListView,List<MDictionary> mDictionaryList) {
-        this.activity = activity;
-        this.mListView = mListView;
-        this.mDictionaryList = mDictionaryList;
-    }
 
-    public void run() {
+    public static void run(MainActivity activity, ListView mListView) {
+
 
         File file=new File(Application.sPath4);
         if(!file.exists()) return;
         List<File> fileList=new ArrayList<>();
         recursion(file,fileList);
-        Map<String,pairWord> map=new HashMap<>();
+        Map<String,MDictionary> map=new HashMap<>();
         for (File ff : fileList) {
             String string = Utils.read(ff);
             if(string!=null&&string.length()>0){
                 String[] s =string.split(" ");
                 for (String s1 : s) {
-                    if(s1.equals("")||
-                            s1.equals(" ")||
-                            s1.equals("-")||
-                            s1.equals(".")||
-                            s1.equals(",")){
+                    if(s1.length()<2){
                         continue;
                     }
                     if(map.containsKey(s1)){
                         map.get(s1).anInt++;
                     }else{
-                        map.put(s1,new pairWord(s1,1));
+                        MDictionary dictionary=new MDictionary();
+                        dictionary.keyWord=s1;
+                        dictionary.anInt=1;
+                        map.put(s1,dictionary);
                     }
                 }
             }
         }
-        List<pairWord> pairWords=new ArrayList<>(map.size());
+        List<MDictionary> pairWords=new ArrayList<>(map.size());
 
-        for (Map.Entry<String, pairWord> ss : map.entrySet()) {
+        for (Map.Entry<String, MDictionary> ss : map.entrySet()) {
             pairWords.add( ss.getValue());
         }
-        Collections.sort(pairWords, new Comparator<pairWord>() {
+        Collections.sort(pairWords, new Comparator<MDictionary>() {
             @Override
-            public int compare(pairWord o1, pairWord o2) {
+            public int compare(MDictionary o1, MDictionary o2) {
                 return Integer.compare(o1.anInt,o2.anInt);
             }
         });
@@ -77,7 +70,7 @@ public class AnalysisTexts {
         Collections.reverse(pairWords);
 
         Map<String,MDictionary> dictionaryMap=new HashMap<>();
-        for (MDictionary dictionary : mDictionaryList) {
+        for (MDictionary dictionary : activity.mDictionaryList) {
             String string = dictionary.keyWord.trim().toUpperCase();
             if(dictionaryMap.containsKey(string)){
 
@@ -85,20 +78,23 @@ public class AnalysisTexts {
                 dictionaryMap.put(string,dictionary);
             }
         }
-        for (pairWord pairWord : pairWords) {
-            String ss=pairWord.word.trim().toUpperCase().replace(".","").replace(",","");
+        for (MDictionary pairWord : pairWords) {
+            String ss=pairWord.keyWord.trim().toUpperCase().replace(".","").replace(",","");
             if(dictionaryMap.containsKey(ss)){
-                pairWord.translate=dictionaryMap.get(ss).valueWord;
+                pairWord.valueWord=dictionaryMap.get(ss).valueWord;
             }
         }
 
+        activity.mDictionaryListAnalise=pairWords;
 
 
-        MyArrayAdapterAnalises ad=new MyArrayAdapterAnalises(activity,R.layout.item_analises,pairWords,activity,mDictionaryList,dictionaryMap);
-        mListView.setAdapter(ad);
+
+        ArrayAdapter<MDictionary> mAdapter=new MyArrayAdapterAnalises(activity,R.layout.item_analises,pairWords,activity,activity.mDictionaryList,dictionaryMap);
+        mListView.setAdapter(mAdapter);
+        Settings.core().setPath(null);
 
     }
-    void recursion(File file, List<File> fileList){
+    static void recursion(File file, List<File> fileList){
         if(!file.isDirectory()){
             fileList.add(file);
             return;
@@ -112,30 +108,19 @@ public class AnalysisTexts {
             }
         }
     }
-
-
 }
-class pairWord{
-    public pairWord(String word,int i){
-        this.word=word;
-        this.anInt=i;
 
-    }
-    public String word;
-    public int anInt;
-    public String translate;
-}
-class MyArrayAdapterAnalises extends ArrayAdapter<pairWord> {
+class MyArrayAdapterAnalises extends ArrayAdapter<MDictionary> implements IMDictionaryList {
 
     private final Context context;
     private final int mResource;
-    private final List<pairWord> objects;
+    private final List<MDictionary> objects;
     private final Activity activity;
     private List<MDictionary> mDictionaryList;
     private Map<String, MDictionary> map;
 
 
-    MyArrayAdapterAnalises(Context context, int resource, List<pairWord> objects, Activity activity, List<MDictionary> mDictionaryList,Map<String,MDictionary> map) {
+    MyArrayAdapterAnalises(Context context, int resource, List<MDictionary> objects, Activity activity, List<MDictionary> mDictionaryList,Map<String,MDictionary> map) {
             super(context, resource, objects);
         this.context = context;
         this.mResource = resource;
@@ -148,15 +133,15 @@ class MyArrayAdapterAnalises extends ArrayAdapter<pairWord> {
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        final pairWord p = getItem(position);
+        final MDictionary p = getItem(position);
         View mView =  LayoutInflater.from(getContext()).inflate(mResource, null);
 
         TextView word= (TextView) mView.findViewById(R.id.word_x);
         TextView count= (TextView) mView.findViewById(R.id.word_count_x);
         final TextView tranclate= (TextView) mView.findViewById(R.id.word_translate_x);
         final ImageView imageView= (ImageView) mView.findViewById(R.id.bt_x);
-        if(p.translate!=null){
-            tranclate.setText(p.translate);
+        if(p.valueWord!=null){
+            tranclate.setText(p.valueWord);
             imageView.setVisibility(View.GONE);
         }else {
             tranclate.setText("");
@@ -165,20 +150,23 @@ class MyArrayAdapterAnalises extends ArrayAdapter<pairWord> {
             @Override
             public void onClick(View v) {
                 List<MDictionary> list= new ArrayList<>();
-                Utils.SenderYandex(p.word,list,activity);
+                Utils.SenderYandex(p.keyWord,list,activity);
                 DialogSearshWord selectText=new DialogSearshWord();
                 selectText.setDictionary(list);
                 selectText.setiAction(new IAction() {
                     @Override
                     public void action(Object o) {
-                        p.translate=o.toString();
-                        String ss=p.word.trim().toUpperCase().replace(".","").replace(",","");
+                        p.valueWord=o.toString();
+                        String ss=p.keyWord.trim().toUpperCase().replace(".","").replace(",","");
                         MDictionary dd= new MDictionary();
-                        dd.keyWord=p.word;
+                        dd.keyWord=p.keyWord;
                         dd.valueWord=o.toString();
                         Configure.getSession().insert(dd);
                         mDictionaryList.add(dd);
-                        map.put(ss,dd);
+                        if(map!=null){
+                            map.put(ss,dd);
+                        }
+
                         tranclate.setText(o.toString());
                         imageView.setVisibility(View.GONE);
                     }
@@ -188,11 +176,16 @@ class MyArrayAdapterAnalises extends ArrayAdapter<pairWord> {
         });
 
 
-        word.setText(p.word);
+        word.setText(p.keyWord);
         count.setText(String.valueOf(p.anInt));
 
 
         mView.setTag(p);
         return mView;
+    }
+
+    @Override
+    public List<MDictionary> getList() {
+        return objects;
     }
 }

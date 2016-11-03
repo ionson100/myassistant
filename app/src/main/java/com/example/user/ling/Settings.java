@@ -1,5 +1,9 @@
 package com.example.user.ling;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.v4.app.ListFragment;
+
 import com.settings.ion.mylibrary.Reanimator;
 import com.settings.ion.mylibrary.SettingField;
 import com.settings.ion.mylibrary.TypeField;
@@ -74,5 +78,22 @@ public class Settings implements Serializable {
         }
     }
 
+    private String path;
 
+
+    public String getPath() {
+        return path;
+
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+        save();
+    }
+
+    public int stateList;
+
+    public int[] stateText=new int[2];
 }
+
+
