@@ -71,6 +71,10 @@ public class MainActivity extends AppCompatActivity {
     private android.view.ActionMode mActionMode;
 
 
+    private static MainActivity mainActivity;
+    public static MainActivity getActivity(){
+        return mainActivity;
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -171,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mainActivity=MainActivity.this;
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         mEditText = (EditText) findViewById(R.id.find_word);

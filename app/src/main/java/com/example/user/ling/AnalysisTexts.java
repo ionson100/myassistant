@@ -115,7 +115,7 @@ class MyArrayAdapterAnalises extends ArrayAdapter<MDictionary> implements IMDict
     private final Context context;
     private final int mResource;
     private final List<MDictionary> objects;
-    private final Activity activity;
+    private Activity activity;
     private List<MDictionary> mDictionaryList;
     private Map<String, MDictionary> map;
 
@@ -149,6 +149,9 @@ class MyArrayAdapterAnalises extends ArrayAdapter<MDictionary> implements IMDict
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(activity==null){
+                    activity=MainActivity.getActivity();
+                }
                 List<MDictionary> list= new ArrayList<>();
                 Utils.SenderYandex(p.keyWord,list,activity);
                 DialogSearshWord selectText=new DialogSearshWord();
@@ -171,7 +174,9 @@ class MyArrayAdapterAnalises extends ArrayAdapter<MDictionary> implements IMDict
                         imageView.setVisibility(View.GONE);
                     }
                 });
-                selectText.show(((MainActivity)activity).getSupportFragmentManager(),"skdsjf");
+
+                    selectText.show(((MainActivity)activity).getSupportFragmentManager(),"skdsjf");
+
             }
         });
 
