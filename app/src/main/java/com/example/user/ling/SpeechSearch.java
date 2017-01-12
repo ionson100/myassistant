@@ -36,7 +36,7 @@ class SpeechSearch{
 
                 // добавляем дополнительные параметры:
 
-                if(Settings.core().directTraslateSpeec){
+                if(Settings.core().directTraslate){
 
                 }else{
                     intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");

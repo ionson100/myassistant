@@ -34,7 +34,9 @@ public interface ISession {
 
 //    void close();
 
-    void deleteTable(String tableName);
+    int deleteTable(String tableName);
+
+    int deleteTable(String tableName, String where, Object... objects);
 
 
 }

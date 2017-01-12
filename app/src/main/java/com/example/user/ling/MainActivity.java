@@ -564,7 +564,7 @@ public class MainActivity extends AppCompatActivity {
         List<MDictionary> dictionaryArrayList = new ArrayList<>();
         if (selectedText.trim().length() > 0) {
 
-            if (!Settings.core().synchTraslate) {
+            if (!Settings.core().directTraslate) {
                 String res = selectedText.trim().toUpperCase();
                 String res2 = null;
 

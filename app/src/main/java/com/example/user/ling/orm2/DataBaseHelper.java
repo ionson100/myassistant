@@ -1,7 +1,6 @@
 package com.example.user.ling.orm2;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -15,7 +14,7 @@ import java.io.OutputStream;
 class DataBaseHelper extends SQLiteOpenHelper {
 
 
-   // private static final SQLiteDatabase myDataBase = null;
+    // private static final SQLiteDatabase myDataBase = null;
     private static String DB_PATH = "";
     private static Context mContext;
 
@@ -37,7 +36,7 @@ class DataBaseHelper extends SQLiteOpenHelper {
                 copyDataBase();
             } catch (IOException e) {
                 Loger.LogE(e.getMessage());
-                throw new Error("MError copying database"+e.getMessage());
+                throw new Error("MError copying database");
             }
         }
     }
@@ -59,15 +58,10 @@ class DataBaseHelper extends SQLiteOpenHelper {
     }
 
 
-
-
     public void copyDataBase() throws IOException {
 
         String fff = Configure.dataBaseName;
         String baseName = fff.substring(fff.lastIndexOf(File.separator) + 1);
-
-        AssetManager am = mContext.getAssets();
-
         InputStream myInput = mContext.getAssets().open(baseName);
         OutputStream myOutput = new FileOutputStream(DB_PATH);
         byte[] buffer = new byte[1024];
@@ -88,9 +82,6 @@ class DataBaseHelper extends SQLiteOpenHelper {
     public SQLiteDatabase openDataBaseForWritable() throws SQLException {
         return this.getWritableDatabase();
     }
-
-
-
 
 
     @Override

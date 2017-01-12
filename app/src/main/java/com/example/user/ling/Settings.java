@@ -23,42 +23,43 @@ public class Settings implements Serializable {
         Reanimator.save(Settings.class);
     }
 
-    @SettingField(
-            descriptions = R.string.direct_translate,
-            index = 1,
-            title = R.string.direct_translate_titl,
-            typeField = TypeField.BooleanSwitch)
-    public boolean directTraslate ;
+//    @SettingField(
+//            descriptions = R.string.direct_translate,
+//            index = 1,
+//            title = R.string.direct_translate_titl,
+//            typeField = TypeField.BooleanSwitch)
+//    public boolean directTraslate ;
+
+
+//    @SettingField(
+//            descriptions = R.string.synch_translate,
+//            index = 2,
+//            title = R.string.dsynch_translate_titl,
+//            typeField = TypeField.BooleanSwitch)
+//    public boolean synchTraslate ;
 
 
     @SettingField(
-            descriptions = R.string.synch_translate,
-            index = 2,
-            title = R.string.dsynch_translate_titl,
-            typeField = TypeField.BooleanSwitch)
-    public boolean synchTraslate ;
-
-
-    @SettingField(
-            index = 3,
+            index = 4,
             title = R.string.paint_word_titl,
             typeField = TypeField.BooleanSwitch)
     public boolean paintWords =true ;
-
-
-    @SettingField(
-            descriptions = R.string.direct_translate_speech,
-            index = 4,
-            title = R.string.direct_translate_speech_titl,
-            typeField = TypeField.BooleanSwitch)
-    public boolean directTraslateSpeec ;
-
 
     @SettingField(
             index = 5,
             title = R.string.color_select_word,
             typeField = TypeField.Color)
     public int colorSelectWords =0xFFFF0000 ;
+
+    @SettingField(
+            descriptions = R.string.direct_translate_speech,
+            index = 6,
+            title = R.string.direct_translate_speech_titl,
+            typeField = TypeField.BooleanSwitch)
+    public boolean directTraslate;
+
+
+
 
 
     public static transient List<WrapperAction>  iActions;

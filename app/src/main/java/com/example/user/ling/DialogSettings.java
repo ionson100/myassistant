@@ -8,7 +8,9 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import com.settings.ion.mylibrary.Reanimator;
 import com.settings.ion.mylibrary.Settingion;
+import com.settings.ion.mylibrary.iListenerСhanges;
 
 
 public class DialogSettings extends DialogFragment {
@@ -16,7 +18,6 @@ public class DialogSettings extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater vi;
         vi = LayoutInflater.from(getActivity());
@@ -26,5 +27,4 @@ public class DialogSettings extends DialogFragment {
         builder.setView(v);
         return builder.create();
     }
-
 }
