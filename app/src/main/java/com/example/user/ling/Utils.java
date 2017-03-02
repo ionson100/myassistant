@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.AssetManager;
 import android.graphics.Point;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentActivity;
 import android.text.Html;
 import android.util.Log;
@@ -53,6 +55,7 @@ public class Utils {
                 }
             }
             Collections.sort(selectList, new Comparator<MDictionary>() {
+                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
                 public int compare(MDictionary mDictionary, MDictionary t1) {
                     return Integer.compare(mDictionary.index,t1.index);
@@ -133,28 +136,31 @@ public class Utils {
         ProgressDialog dialog = new ProgressDialog(mActivity);
         dialog.setMessage(msg);
         dialog.setIndeterminate(true);
-        if (iAction == null) {
+        if (iAction != null) {
             dialog.setCancelable(false);
         } else {
             dialog.setCancelable(true);
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
+                    if(iAction!=null)
                     iAction.action(null);
                 }
             });
         }
+
+
         return dialog;
     }
 
-    static void SenderYandex(String selectedText, List<MDictionary> dictionaryArrayList, Activity activity) {
+    static void SenderYandex(String selectedText, List<MDictionary> dictionaryArrayList, Activity activity,IAction iAction) {
         String translatedText="";
         try {
             Translate.setKey("trnsl.1.1.20161006T095643Z.9887c471401acf62.edb45ac820c51c1dc67ee16076cb0390c4806133");
             if(Settings.core().directTraslate==false){
-                translatedText = Translate.execute(selectedText, Language.ENGLISH, Language.RUSSIAN,activity);
+                translatedText = Translate.execute(selectedText, Language.ENGLISH, Language.RUSSIAN,activity,iAction);
             }else{
-                translatedText = Translate.execute(selectedText, Language.RUSSIAN, Language.ENGLISH,activity);
+                translatedText = Translate.execute(selectedText, Language.RUSSIAN, Language.ENGLISH,activity,iAction);
             }
 
         } catch (Exception e) {

@@ -1,6 +1,7 @@
 package com.example.user.ling;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.media.midi.MidiDeviceInfo;
 import android.support.annotation.NonNull;
@@ -153,7 +154,16 @@ class MyArrayAdapterAnalises extends ArrayAdapter<MDictionary> implements IMDict
                     activity=MainActivity.getActivity();
                 }
                 List<MDictionary> list= new ArrayList<>();
-                Utils.SenderYandex(p.keyWord,list,activity);
+                final ProgressDialog dialog = Utils.factoryDialog(activity, "Запрос на Яндекс", null);
+                dialog.show();
+                Utils.SenderYandex(p.keyWord, list, activity, new IAction() {
+                    @Override
+                    public void action(Object o) {
+                        if(dialog!=null){
+                            dialog.cancel();
+                        }
+                    }
+                });
                 DialogSearshWord selectText=new DialogSearshWord();
                 selectText.setDictionary(list);
                 selectText.setiAction(new IAction() {

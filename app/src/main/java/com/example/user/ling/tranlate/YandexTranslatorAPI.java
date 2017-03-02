@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 
+import com.example.user.ling.IAction;
 import com.example.user.ling.Utils;
 
 import java.io.BufferedReader;
@@ -29,15 +30,16 @@ public abstract class YandexTranslatorAPI {
         apiKey = pKey;
     }
 
-    private static String retrieveResponse(final URL url) throws Exception {
+    private static String retrieveResponse(final URL url,IAction iAction) throws Exception {
         RetrieveFeedTask dd = new RetrieveFeedTask();
+        dd.setiAction(iAction);
         AsyncTask<URL, Void, String> sd= dd.execute(url);
         return sd.get();
     }
 
-    protected static String retrievePropArrString(final URL url, final String jsonValProperty, Activity activity) throws Exception {
+    protected static String retrievePropArrString(final URL url, final String jsonValProperty, Activity activity, IAction iAction) throws Exception {
         YandexTranslatorAPI.activity = activity;
-        String response = retrieveResponse(url);
+        String response = retrieveResponse(url,iAction);
         return response;
 
     }
@@ -52,25 +54,37 @@ public abstract class YandexTranslatorAPI {
 
 }
 class RetrieveFeedTask extends AsyncTask<URL, Void, String> {
-    ProgressDialog dialog;
+   // ProgressDialog dialog;
+
+    private IAction iAction;
+
+    public void setiAction(IAction iAction){
+        this.iAction=iAction;
+    }
 
     @Override
     protected void onPreExecute() {
-        dialog = Utils.factoryDialog(activity, "Запрос на Яндекс", null);
-        dialog.show();
+//        dialog = Utils.factoryDialog(activity, "Запрос на Яндекс", null);
+//        dialog.show();
     }
 
     @Override
     protected void onPostExecute(String s) {
-        if (dialog != null) {
-            dialog.cancel();
+        if(iAction!=null){
+            iAction.action(null);
         }
+//        if (dialog != null) {
+//            dialog.cancel();
+//        }
     }
 
     @Override
     protected String doInBackground(URL... url) {
         HttpsURLConnection uc=null;
         try {
+
+
+
             uc = (HttpsURLConnection) url[0].openConnection();
             uc.setRequestProperty("Content-Type","text/plain; charset=" + ENCODING);
             uc.setRequestProperty("Accept-Charset",ENCODING);

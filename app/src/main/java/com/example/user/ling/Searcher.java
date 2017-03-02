@@ -1,5 +1,7 @@
 package com.example.user.ling;
 
+import android.app.ProgressDialog;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +18,16 @@ public class Searcher {
             }
         }
         List<MDictionary> list2=new ArrayList<>();
-        Utils.SenderYandex(word,list2,activity);
+        final ProgressDialog dialog = Utils.factoryDialog(activity, "Запрос на Яндекс", null);
+        dialog.show();
+        Utils.SenderYandex(word, list2, activity, new IAction() {
+            @Override
+            public void action(Object o) {
+                if(dialog!=null){
+                    dialog.cancel();
+                }
+            }
+        });
         for (MDictionary dictionary : list2) {
             list.add(0,dictionary);
         }

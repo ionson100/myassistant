@@ -1,6 +1,7 @@
 package com.example.user.ling;
 
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.AsyncTask;
@@ -40,8 +41,10 @@ import java.util.Random;
 
 import static com.example.user.ling.tranlate.YandexTranslatorAPI.activity;
 
-
 public class MainActivity extends AppCompatActivity {
+
+
+    private IAction iActionBack;
 
     private static final int YANDEX = 29247;
 
@@ -191,9 +194,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-//                menu.removeItem(android.R.id.selectAll);
-//                menu.removeItem(android.R.id.cut);
-//                menu.removeItem(android.R.id.copy);
+                menu.removeItem(android.R.id.selectAll);
+                menu.removeItem(android.R.id.cut);
+                menu.removeItem(android.R.id.copy);
                 return true;
             }
 
@@ -208,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDestroyActionMode(ActionMode mode) {}
 
             @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
                 switch (item.getItemId()) {
                     case DEFINITION:{
                         int min = 0;
@@ -236,9 +239,31 @@ public class MainActivity extends AppCompatActivity {
                             min = Math.max(0, Math.min(selStart, selEnd));
                             max = Math.max(0, Math.max(selStart, selEnd));
                         }
-                        final String selectedText = mTextCore.getText().subSequence(min, max).toString();
-                        translateYandex(selectedText);
-                        mode.finish();
+
+                        final ProgressDialog dialog = Utils.factoryDialog(MainActivity.this, "Запрос на Яндекс", null);
+                        dialog.show();
+
+
+                        final int finalMin = min;
+                        final int finalMax = max;
+                        final String selectedText = mTextCore.getText().subSequence(finalMin, finalMax).toString();
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                translateYandex(selectedText, new IAction() {
+                                    @Override
+                                    public void action(Object o) {
+                                        if (dialog != null) {
+                                            dialog.cancel();
+                                        }
+                                    }
+                                },iActionBack);
+                                //mode.finish();
+                            }
+                        }).start();
+
+
                         return true;
                     }
 
@@ -294,8 +319,17 @@ public class MainActivity extends AppCompatActivity {
                                     min = Math.max(0, Math.min(selStart, selEnd));
                                     max = Math.max(0, Math.max(selStart, selEnd));
                                 }
+                                final ProgressDialog dialog = Utils.factoryDialog(MainActivity.this, "Запрос на Яндекс", null);
+                                dialog.show();
                                 final String selectedText = mTextCore.getText().subSequence(min, max).toString();
-                                translateYandex(selectedText);
+                                translateYandex(selectedText, new IAction() {
+                                    @Override
+                                    public void action(Object o) {
+                                        if (dialog != null) {
+                                            dialog.cancel();
+                                        }
+                                    }
+                                },iActionBack);
                                 actionMode.finish();
                                 return true;
                             }
@@ -376,7 +410,16 @@ public class MainActivity extends AppCompatActivity {
                 List<MDictionary> list= new ArrayList<>();
 
                 if(list.size()==0){
-                    Utils.SenderYandex(string,list,MainActivity.this);
+                    final ProgressDialog dialog = Utils.factoryDialog(MainActivity.this, "Запрос на Яндекс", null);
+                    dialog.show();
+                    Utils.SenderYandex(string, list, MainActivity.this, new IAction() {
+                        @Override
+                        public void action(Object o) {
+                            if(dialog!=null){
+                                dialog.cancel();
+                            }
+                        }
+                    });
                 }
 
                 DialogSearshWord selectText=new DialogSearshWord();
@@ -552,11 +595,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void translateYandex(String selectedText) {
-        List<MDictionary> dictionaryArrayList=getWordFromYandex(selectedText);
-        DialogSearshWord selectText=new DialogSearshWord();
+    private void translateYandex(String selectedText, final IAction iAction, IAction calback) {
+        final boolean[] notrun = {false};
+        calback=new IAction() {
+            @Override
+            public void action(Object o) {
+                notrun[0] =true;
+                iAction.action(null);
+            }
+        };
+
+
+            List<MDictionary> dictionaryArrayList=getWordFromYandex(selectedText,iAction);
+
+
+        if( notrun[0]==true){
+            return;
+        }
+        DialogSearshWord selectText = new DialogSearshWord();
         selectText.setDictionary(dictionaryArrayList);
-        selectText.show(getSupportFragmentManager(),"skdsjf");
+        selectText.show(MainActivity.this.getSupportFragmentManager(),"skdsj34f");
+
     }
 
 
@@ -588,7 +647,16 @@ public class MainActivity extends AppCompatActivity {
 
                 } else {
                     if(isSenderYandex){
-                        Utils.SenderYandex(selectedText, dictionaryArrayList, MainActivity.this);
+                        final ProgressDialog dialog = Utils.factoryDialog(MainActivity.this, "Запрос на Яндекс", null);
+                        dialog.show();
+                        Utils.SenderYandex(selectedText, dictionaryArrayList, MainActivity.this, new IAction() {
+                            @Override
+                            public void action(Object o) {
+                                if(dialog!=null){
+                                    dialog.cancel();
+                                }
+                            }
+                        });
                     }
 
 
@@ -629,11 +697,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    List<MDictionary> getWordFromYandex(String selectedText) {
+    List<MDictionary> getWordFromYandex(String selectedText,IAction iAction) {
 
         List<MDictionary> dictionaryArrayList = new ArrayList<>();
 
-        Utils.SenderYandex(selectedText, dictionaryArrayList, MainActivity.this);
+        Utils.SenderYandex(selectedText, dictionaryArrayList, MainActivity.this,iAction);
 
         return dictionaryArrayList;
     }
@@ -896,6 +964,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
+
+        if(iActionBack!=null){
+            iActionBack.action(null);
+        }
 
         if(mListView.getAdapter() instanceof MyArrayAdapterAnalises){
             ArrayAdapter<MDictionary>  aa = new MyArrayAdapterWord(MainActivity.this, R.layout.simple_list_item_1, mDictionaryList,MainActivity.this);
