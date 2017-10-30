@@ -17,48 +17,6 @@ public class Application extends android.app.Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        {
-            File d=new File(sPath2);
-            if(!d.exists()){
-                d.mkdirs();
-                d.setExecutable(true);
-                d.setReadable(true);
-                d.setWritable(true);
-                MediaScannerConnection.scanFile(this, new String[] {sPath2}, null, null);
-            }
-        }
-        {
-            File d=new File(sPath3);
-            if(!d.exists()){
-                d.mkdirs();
-                d.setExecutable(true);
-                d.setReadable(true);
-                d.setWritable(true);
-                MediaScannerConnection.scanFile(this, new String[] {sPath3}, null, null);
-            }
-        }
-        {
-            File d=new File(sPath4);
-            if(!d.exists()){
-                d.mkdirs();
-                d.setExecutable(true);
-                d.setReadable(true);
-                d.setWritable(true);
-                MediaScannerConnection.scanFile(this, new String[] {sPath4}, null, null);
-            }
-        }
-        if(!new File(sPath3+"/"+"have.html").exists()){
-            Utils.copyAssets(getApplicationContext(),sPath3,"have.html");
-            MediaScannerConnection.scanFile(this, new String[] {sPath3+"/"+"have.html"}, null, null);
-        }
-        if(!new File(sPath4+"/"+"lesson.txt").exists()){
-            Utils.copyAssets(getApplicationContext(),sPath4,"lesson.txt");
-            MediaScannerConnection.scanFile(this, new String[] {sPath4+"/"+"lesson.txt"}, null, null);
-        }
 
-
-
-        new Configure(sPath1,getApplicationContext(), false);
-        com.settings.ion.mylibrary.Reanimator.intContext(getApplicationContext());
     }
 }

@@ -1,9 +1,11 @@
 package com.example.user.ling;
 
+import android.Manifest;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Rect;
+import android.media.MediaScannerConnection;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -177,6 +179,71 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (Build.VERSION.SDK_INT >= 23) {
+
+            String[] INITIAL_PERMS = {
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_WIFI_STATE,
+                    Manifest.permission.ACCESS_NETWORK_STATE,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.GET_ACCOUNTS,
+                    Manifest.permission.READ_CONTACTS,
+                    Manifest.permission.VIBRATE,
+                    Manifest.permission.INTERNET,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.READ_PHONE_STATE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+            };//12
+
+            requestPermissions(INITIAL_PERMS, 1327);
+        }
+        ////////////////////////////////////////////////////////////// starting
+        {
+            File d=new File(Application.sPath2);
+            if(!d.exists()){
+                d.mkdirs();
+                d.setExecutable(true);
+                d.setReadable(true);
+                d.setWritable(true);
+                MediaScannerConnection.scanFile(this, new String[] {Application.sPath2}, null, null);
+            }
+        }
+        {
+            File d=new File(Application.sPath3);
+            if(!d.exists()){
+                d.mkdirs();
+                d.setExecutable(true);
+                d.setReadable(true);
+                d.setWritable(true);
+                MediaScannerConnection.scanFile(this, new String[] {Application.sPath3}, null, null);
+            }
+        }
+        {
+            File d=new File(Application.sPath4);
+            if(!d.exists()){
+                d.mkdirs();
+                d.setExecutable(true);
+                d.setReadable(true);
+                d.setWritable(true);
+                MediaScannerConnection.scanFile(this, new String[] {Application.sPath4}, null, null);
+            }
+        }
+        if(!new File(Application.sPath3+"/"+"have.html").exists()){
+            Utils.copyAssets(getApplicationContext(),Application.sPath3,"have.html");
+            MediaScannerConnection.scanFile(this, new String[] {Application.sPath3+"/"+"have.html"}, null, null);
+        }
+        if(!new File(Application.sPath4+"/"+"lesson.txt").exists()){
+            Utils.copyAssets(getApplicationContext(),Application.sPath4,"lesson.txt");
+            MediaScannerConnection.scanFile(this, new String[] {Application.sPath4+"/"+"lesson.txt"}, null, null);
+        }
+
+
+
+        new Configure(Application.sPath1,getApplicationContext(), false);
+        com.settings.ion.mylibrary.Reanimator.intContext(getApplicationContext());
+        ////////////////////////////////////////////////////////////////////////
 
         mainActivity=MainActivity.this;
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -410,7 +477,7 @@ public class MainActivity extends AppCompatActivity {
                 List<MDictionary> list= new ArrayList<>();
 
                 if(list.size()==0){
-                    final ProgressDialog dialog = Utils.factoryDialog(MainActivity.this, "Запрос на Яндекс", null);
+                    final ProgressDialog dialog = Utils.factoryDialog(MainActivity.this, getString(R.string.dhsdg), null);
                     dialog.show();
                     Utils.SenderYandex(string, list, MainActivity.this, new IAction() {
                         @Override
